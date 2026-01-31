@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_cd7285a65b7cd0ca325b8d6c5a423460 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ardhi/Leaflet.MousePosition/src/L.Control.MousePosition.min.css"/>
+</head>
+<body>
+    
+    
+<div style="
+    position: fixed; 
+    bottom: 20px; left: 20px; z-index:9999; 
+    background: white; padding: 10px 12px; 
+    border:1px solid #ccc; border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.2);
+    font-family: Arial; font-size: 12px;">
+
+  <div style="font-weight:600; margin-bottom:6px;">Légende</div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="display:inline-block; width:12px; height:12px; background:#FFD700; border-radius:50%; border:1px solid #999;"></span>
+    <span>Où j'apporte mes déchets</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="display:inline-block; width:12px; height:12px; background:#FF0000; border-radius:50%; border:1px solid #999;"></span>
+    <span>Lieux d'économie circulaire</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="display:inline-block; width:12px; height:12px; background:#0000FF; border-radius:50%; border:1px solid #999;"></span>
+    <span>Où je m'approvisionne)</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="display:inline-block; width:12px; height:12px; background:#00B050; border-radius:50%; border:1px solid #999;"></span>
+    <span>Lieux stratégiques pour l'implantation d'un acteur de l'Economie Circulaire</span>
+  </div>
+</div>
+    
+<style>
+    /* Police personnalisée pour les étiquettes */
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
+    .leaflet-tooltip {
+        font-family: 'Roboto', sans-serif;
+        font-size: 13px;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    /* Bouton */
+    #toggle-tooltips-btn {
+        position: fixed;
+        top: 20px; 
+        right: 20px;
+        z-index: 9999;
+        background: white;
+        border: 1px solid #999;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: Arial;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+</style>
+
+<button id="toggle-tooltips-btn">Masquer étiquettes</button>
+
+<script>
+let tooltipVisible = true;
+
+document.getElementById("toggle-tooltips-btn").onclick = function () {
+    tooltipVisible = !tooltipVisible;
+
+    // Mettre à jour le texte du bouton
+    this.innerText = tooltipVisible ? "Masquer étiquettes" : "Afficher étiquettes";
+
+    // Parcourir tous les tooltips Leaflet
+    document.querySelectorAll('.leaflet-tooltip').forEach(tt => {
+        tt.style.display = tooltipVisible ? "block" : "none";
+    });
+};
+</script>
+    
+            <div class="folium-map" id="map_cd7285a65b7cd0ca325b8d6c5a423460" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_cd7285a65b7cd0ca325b8d6c5a423460 = L.map(
+                "map_cd7285a65b7cd0ca325b8d6c5a423460",
+                {
+                    center: [43.404530462945296, -1.2866100653762822],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 6,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+
+            
+
+        
+    
+            var tile_layer_3271ae8fea6d3fdf71f8c5f9b3d2ee7d = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_3271ae8fea6d3fdf71f8c5f9b3d2ee7d.addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            var tile_layer_4fe39183ee7acdfc0c0e8b5143ef2d60 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_caa31dff7bdc9256e26ef3b1e4916535 = new L.Control.MiniMap(
+                tile_layer_4fe39183ee7acdfc0c0e8b5143ef2d60,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_cd7285a65b7cd0ca325b8d6c5a423460.addControl(mini_map_caa31dff7bdc9256e26ef3b1e4916535);
+        
+    
+            var mouse_position_50acac93b2cfdf5b6257296b498b51a3 = new L.Control.MousePosition(
+                {
+  "position": "bottomright",
+  "separator": " | ",
+  "emptyString": "Unavailable",
+  "lngFirst": true,
+  "numDigits": 5,
+  "prefix": "Coordonn\u00e9es",
+}
+            );
+            mouse_position_50acac93b2cfdf5b6257296b498b51a3.options["latFormatter"] =
+                undefined;
+            mouse_position_50acac93b2cfdf5b6257296b498b51a3.options["lngFormatter"] =
+                undefined;
+            map_cd7285a65b7cd0ca325b8d6c5a423460.addControl(mouse_position_50acac93b2cfdf5b6257296b498b51a3);
+        
+    
+            var feature_group_2a16e65bed95597a1dd603cc603001a5 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_f21a60713dbde8dabcd823dafaba275f = L.circleMarker(
+                [43.46264695895484, -1.5056265227388876],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_c0e8a56e94168b297e341b1a61f97115 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1b2aecf5a61c9a6abb20d9ed0e811849 = $(`<div id="html_1b2aecf5a61c9a6abb20d9ed0e811849" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">CETRAID</div>         <div>Gestion des déchets et valorisation (Groupe Etchart)</div>     </div>     </div>`)[0];
+                popup_c0e8a56e94168b297e341b1a61f97115.setContent(html_1b2aecf5a61c9a6abb20d9ed0e811849);
+            
+        
+
+        circle_marker_f21a60713dbde8dabcd823dafaba275f.bindPopup(popup_c0e8a56e94168b297e341b1a61f97115)
+        ;
+
+        
+    
+    
+            circle_marker_f21a60713dbde8dabcd823dafaba275f.bindTooltip(
+                `<div>
+                     CETRAID
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_354302763841560d2d31410d8c5c9887 = L.circleMarker(
+                [43.52604333336027, -1.507389698250533],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_2f18ea6f8dd6c3e615ac0c9c326d20c5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8f5dea98104c3343c55b0f4dbe4f674b = $(`<div id="html_8f5dea98104c3343c55b0f4dbe4f674b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Port d&#x27;Anglet</div>         <div>Idée évoquée : exploitation des ports et du réseau fluOal à intégrer à la réflexion</div>     </div>     </div>`)[0];
+                popup_2f18ea6f8dd6c3e615ac0c9c326d20c5.setContent(html_8f5dea98104c3343c55b0f4dbe4f674b);
+            
+        
+
+        circle_marker_354302763841560d2d31410d8c5c9887.bindPopup(popup_2f18ea6f8dd6c3e615ac0c9c326d20c5)
+        ;
+
+        
+    
+    
+            circle_marker_354302763841560d2d31410d8c5c9887.bindTooltip(
+                `<div>
+                     Port d&#x27;Anglet
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1220157ddb1ed3d5157b88eca80af3fd = L.circleMarker(
+                [43.48837475701547, -1.5265234819604974],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_2672b01014fd4e995ad4b6e88498bb80 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_804aa8f4ec47b2b16acb193dcdf9345d = $(`<div id="html_804aa8f4ec47b2b16acb193dcdf9345d" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Port de Tarnos</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_2672b01014fd4e995ad4b6e88498bb80.setContent(html_804aa8f4ec47b2b16acb193dcdf9345d);
+            
+        
+
+        circle_marker_1220157ddb1ed3d5157b88eca80af3fd.bindPopup(popup_2672b01014fd4e995ad4b6e88498bb80)
+        ;
+
+        
+    
+    
+            circle_marker_1220157ddb1ed3d5157b88eca80af3fd.bindTooltip(
+                `<div>
+                     Port de Tarnos
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d93a3b77e83f851932a082a0c118cc65 = L.circleMarker(
+                [43.42654460078532, -1.4859969184258994],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_6a4e16a406bcfb5b328819db88a30acf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5b76584cc6311e4c8df07c761ed2748f = $(`<div id="html_5b76584cc6311e4c8df07c761ed2748f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">CBA Matériaux</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_6a4e16a406bcfb5b328819db88a30acf.setContent(html_5b76584cc6311e4c8df07c761ed2748f);
+            
+        
+
+        circle_marker_d93a3b77e83f851932a082a0c118cc65.bindPopup(popup_6a4e16a406bcfb5b328819db88a30acf)
+        ;
+
+        
+    
+    
+            circle_marker_d93a3b77e83f851932a082a0c118cc65.bindTooltip(
+                `<div>
+                     CBA Matériaux
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_aaa2f2d7b9cba59a5ce06a26fc167c19 = L.circleMarker(
+                [43.43971986031223, -1.5730267461182732],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_49d86b1e7e6801782e6b7220f4adbe79 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6302ec50646ccefc3da07f8904991de7 = $(`<div id="html_6302ec50646ccefc3da07f8904991de7" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Goyhetche</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_49d86b1e7e6801782e6b7220f4adbe79.setContent(html_6302ec50646ccefc3da07f8904991de7);
+            
+        
+
+        circle_marker_aaa2f2d7b9cba59a5ce06a26fc167c19.bindPopup(popup_49d86b1e7e6801782e6b7220f4adbe79)
+        ;
+
+        
+    
+    
+            circle_marker_aaa2f2d7b9cba59a5ce06a26fc167c19.bindTooltip(
+                `<div>
+                     Goyhetche
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e85ddbc57228727a270d6aabe04f72e7 = L.circleMarker(
+                [43.50984905150089, -1.1116287220901873],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_6e38eacdc8c824785c76190fb2831a10 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4f5c42b4ecbbfee62b5d0b0f84fa8df4 = $(`<div id="html_4f5c42b4ecbbfee62b5d0b0f84fa8df4" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">ART BOIS </div>         <div>Coopérative artisans du bois</div>     </div>     </div>`)[0];
+                popup_6e38eacdc8c824785c76190fb2831a10.setContent(html_4f5c42b4ecbbfee62b5d0b0f84fa8df4);
+            
+        
+
+        circle_marker_e85ddbc57228727a270d6aabe04f72e7.bindPopup(popup_6e38eacdc8c824785c76190fb2831a10)
+        ;
+
+        
+    
+    
+            circle_marker_e85ddbc57228727a270d6aabe04f72e7.bindTooltip(
+                `<div>
+                     ART BOIS 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_eefdc36f785d2a27a68d4ea232107847 = L.circleMarker(
+                [43.40273847409237, -0.9246408150634768],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_72f0120e58c191c1a856a3caac522525 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c9c60c4aaa499ed77252a33eecec552a = $(`<div id="html_c9c60c4aaa499ed77252a33eecec552a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Batiland Etchegintza</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_72f0120e58c191c1a856a3caac522525.setContent(html_c9c60c4aaa499ed77252a33eecec552a);
+            
+        
+
+        circle_marker_eefdc36f785d2a27a68d4ea232107847.bindPopup(popup_72f0120e58c191c1a856a3caac522525)
+        ;
+
+        
+    
+    
+            circle_marker_eefdc36f785d2a27a68d4ea232107847.bindTooltip(
+                `<div>
+                     Batiland Etchegintza
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ffc4e6ed19eafcce24531aaf51c7672a = L.circleMarker(
+                [43.23083267894979, -0.8836844753737944],
+                {"bubblingMouseEvents": true, "color": "#8B5E3C", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8B5E3C", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_37fd93e5f28f2b438beb4212a3af4f98 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_05fd75989f7b389e070de7f4a5e9943a = $(`<div id="html_05fd75989f7b389e070de7f4a5e9943a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Alkar</div>         <div>Localisation des entreprises présentes</div>     </div>     </div>`)[0];
+                popup_37fd93e5f28f2b438beb4212a3af4f98.setContent(html_05fd75989f7b389e070de7f4a5e9943a);
+            
+        
+
+        circle_marker_ffc4e6ed19eafcce24531aaf51c7672a.bindPopup(popup_37fd93e5f28f2b438beb4212a3af4f98)
+        ;
+
+        
+    
+    
+            circle_marker_ffc4e6ed19eafcce24531aaf51c7672a.bindTooltip(
+                `<div>
+                     Alkar
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_81e2890d38f518c292be1a914c1de833 = L.circleMarker(
+                [43.48914226266756, -1.432566287979827],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_e3cdc5157f7be9257b4b5b926c87b58b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_cd2d55f51d5de33fee2ed398122b911f = $(`<div id="html_cd2d55f51d5de33fee2ed398122b911f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Batiland</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_e3cdc5157f7be9257b4b5b926c87b58b.setContent(html_cd2d55f51d5de33fee2ed398122b911f);
+            
+        
+
+        circle_marker_81e2890d38f518c292be1a914c1de833.bindPopup(popup_e3cdc5157f7be9257b4b5b926c87b58b)
+        ;
+
+        
+    
+    
+            circle_marker_81e2890d38f518c292be1a914c1de833.bindTooltip(
+                `<div>
+                     Batiland
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a6dfd15c1f8be76778bf76968d603107 = L.circleMarker(
+                [43.25817994002816, -1.2258655075392677],
+                {"bubblingMouseEvents": true, "color": "#8B5E3C", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8B5E3C", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_59fa7e9b9d57c7df5a1d7c86765cef32 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4847291bbf8f0939b102347144817111 = $(`<div id="html_4847291bbf8f0939b102347144817111" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_59fa7e9b9d57c7df5a1d7c86765cef32.setContent(html_4847291bbf8f0939b102347144817111);
+            
+        
+
+        circle_marker_a6dfd15c1f8be76778bf76968d603107.bindPopup(popup_59fa7e9b9d57c7df5a1d7c86765cef32)
+        ;
+
+        
+    
+    
+            circle_marker_a6dfd15c1f8be76778bf76968d603107.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_536bde0aea76b71f7e4918c73c2ad326 = L.circleMarker(
+                [43.327464104356, -1.3947617508187806],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_9bcf4bed25b7b8b647b8524fa2dda070 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9cbe29ca9ea0121b0db9f31c39de069a = $(`<div id="html_9cbe29ca9ea0121b0db9f31c39de069a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Erobil</div>         <div>Ressourcerie</div>     </div>     </div>`)[0];
+                popup_9bcf4bed25b7b8b647b8524fa2dda070.setContent(html_9cbe29ca9ea0121b0db9f31c39de069a);
+            
+        
+
+        circle_marker_536bde0aea76b71f7e4918c73c2ad326.bindPopup(popup_9bcf4bed25b7b8b647b8524fa2dda070)
+        ;
+
+        
+    
+    
+            circle_marker_536bde0aea76b71f7e4918c73c2ad326.bindTooltip(
+                `<div>
+                     Erobil
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c333c7b5b777c741378ceb94ca2bf90f = L.circleMarker(
+                [43.492716499856776, -1.4235968915521846],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_8098c89670ef2b3cb6f006375e34b746 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_418be2978425fd419c1bc87482376725 = $(`<div id="html_418be2978425fd419c1bc87482376725" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Chausson matériaux</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_8098c89670ef2b3cb6f006375e34b746.setContent(html_418be2978425fd419c1bc87482376725);
+            
+        
+
+        circle_marker_c333c7b5b777c741378ceb94ca2bf90f.bindPopup(popup_8098c89670ef2b3cb6f006375e34b746)
+        ;
+
+        
+    
+    
+            circle_marker_c333c7b5b777c741378ceb94ca2bf90f.bindTooltip(
+                `<div>
+                     Chausson matériaux
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6b650433dcf4d76462dc3e951801ecc0 = L.circleMarker(
+                [43.373978314644646, -0.9554060187520896],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_7f3e35824beae3c3660b2685578dc0dd = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_647cb29559d29d83b4343c2ae2acf2f5 = $(`<div id="html_647cb29559d29d83b4343c2ae2acf2f5" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Le hangar d&#x27;Aima </div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_7f3e35824beae3c3660b2685578dc0dd.setContent(html_647cb29559d29d83b4343c2ae2acf2f5);
+            
+        
+
+        circle_marker_6b650433dcf4d76462dc3e951801ecc0.bindPopup(popup_7f3e35824beae3c3660b2685578dc0dd)
+        ;
+
+        
+    
+    
+            circle_marker_6b650433dcf4d76462dc3e951801ecc0.bindTooltip(
+                `<div>
+                     Le hangar d&#x27;Aima 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e0b429b50383f9fa5c36a6ed6986b42c = L.circleMarker(
+                [43.40607190156922, -1.621541462604582],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_945a983e86311d2f0ab3f7540a95f2db = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_12e38fffceb1abd17b1e12426d075b2e = $(`<div id="html_12e38fffceb1abd17b1e12426d075b2e" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Chausson matériaux</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_945a983e86311d2f0ab3f7540a95f2db.setContent(html_12e38fffceb1abd17b1e12426d075b2e);
+            
+        
+
+        circle_marker_e0b429b50383f9fa5c36a6ed6986b42c.bindPopup(popup_945a983e86311d2f0ab3f7540a95f2db)
+        ;
+
+        
+    
+    
+            circle_marker_e0b429b50383f9fa5c36a6ed6986b42c.bindTooltip(
+                `<div>
+                     Chausson matériaux
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4b1406b54a3d60b38a6362a5640ec520 = L.circleMarker(
+                [43.543156388639936, -1.3711482251909888],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_14c000513151153f351d9e70be63c7df = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_77dce0dedcca05280f2bae0ff0189557 = $(`<div id="html_77dce0dedcca05280f2bae0ff0189557" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">CBA</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_14c000513151153f351d9e70be63c7df.setContent(html_77dce0dedcca05280f2bae0ff0189557);
+            
+        
+
+        circle_marker_4b1406b54a3d60b38a6362a5640ec520.bindPopup(popup_14c000513151153f351d9e70be63c7df)
+        ;
+
+        
+    
+    
+            circle_marker_4b1406b54a3d60b38a6362a5640ec520.bindTooltip(
+                `<div>
+                     CBA
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_731d181c76e77ef9ae64debcb51958db = L.circleMarker(
+                [43.47663903850271, -0.9476831661268657],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_156ef8e717a151a5b40ca7e6a32da385 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1e7ac0539dfd2d58773e8694da1dece2 = $(`<div id="html_1e7ac0539dfd2d58773e8694da1dece2" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Le hangar d&#x27;Aima </div>         <div>Recyclerie</div>     </div>     </div>`)[0];
+                popup_156ef8e717a151a5b40ca7e6a32da385.setContent(html_1e7ac0539dfd2d58773e8694da1dece2);
+            
+        
+
+        circle_marker_731d181c76e77ef9ae64debcb51958db.bindPopup(popup_156ef8e717a151a5b40ca7e6a32da385)
+        ;
+
+        
+    
+    
+            circle_marker_731d181c76e77ef9ae64debcb51958db.bindTooltip(
+                `<div>
+                     Le hangar d&#x27;Aima 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6af787b1db850ea96a78ab5d58c493bd = L.circleMarker(
+                [43.53547302750488, -1.495330594995266],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FFD700", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_2a16e65bed95597a1dd603cc603001a5);
+        
+    
+        var popup_327e14ff7616a6c2c030de5f1d0d7a0e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3001537609da6e690cc9b4fac5ab8548 = $(`<div id="html_3001537609da6e690cc9b4fac5ab8548" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Port de Tarnos</div>         <div>Lieu de stockage souhaité</div>     </div>     </div>`)[0];
+                popup_327e14ff7616a6c2c030de5f1d0d7a0e.setContent(html_3001537609da6e690cc9b4fac5ab8548);
+            
+        
+
+        circle_marker_6af787b1db850ea96a78ab5d58c493bd.bindPopup(popup_327e14ff7616a6c2c030de5f1d0d7a0e)
+        ;
+
+        
+    
+    
+            circle_marker_6af787b1db850ea96a78ab5d58c493bd.bindTooltip(
+                `<div>
+                     Port de Tarnos
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_2a16e65bed95597a1dd603cc603001a5.addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            var feature_group_053be2bbc41c130013758aacb9acb06f = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_9353d20f0bed3d3a49b1c82c9b9a6b7b = L.circleMarker(
+                [43.43103591645453, -1.5730524493990683],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_6ad2c582fe3281eebf201e083fbb196a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_81d22c7418eaf7b8d96b208bfd639364 = $(`<div id="html_81d22c7418eaf7b8d96b208bfd639364" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Bâti récup</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_6ad2c582fe3281eebf201e083fbb196a.setContent(html_81d22c7418eaf7b8d96b208bfd639364);
+            
+        
+
+        circle_marker_9353d20f0bed3d3a49b1c82c9b9a6b7b.bindPopup(popup_6ad2c582fe3281eebf201e083fbb196a)
+        ;
+
+        
+    
+    
+            circle_marker_9353d20f0bed3d3a49b1c82c9b9a6b7b.bindTooltip(
+                `<div>
+                     Bâti récup
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3842aefd77303457cd37356d9ba984e8 = L.circleMarker(
+                [43.25419180974652, -1.2229681476907357],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_dc471a3080b00b260d4db68c7d6bed1b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9e309143c7601c91ae7efad7f7fa11f9 = $(`<div id="html_9e309143c7601c91ae7efad7f7fa11f9" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Les ateliers du Singe</div>         <div>Artisanat avec matériaux de réemploi</div>     </div>     </div>`)[0];
+                popup_dc471a3080b00b260d4db68c7d6bed1b.setContent(html_9e309143c7601c91ae7efad7f7fa11f9);
+            
+        
+
+        circle_marker_3842aefd77303457cd37356d9ba984e8.bindPopup(popup_dc471a3080b00b260d4db68c7d6bed1b)
+        ;
+
+        
+    
+    
+            circle_marker_3842aefd77303457cd37356d9ba984e8.bindTooltip(
+                `<div>
+                     Les ateliers du Singe
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e881e0d7b543921bdf8a149411580ea0 = L.circleMarker(
+                [43.3317881419234, -1.330439022835551],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_0cb9b8ee60dd9d44769c41d7a6ac690e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a88fd5ba08bd91f9302231b9be7717b5 = $(`<div id="html_a88fd5ba08bd91f9302231b9be7717b5" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Atelier Luzatu</div>         <div>Atelier de conception et prototypage de produits à partir de déchets locaux (par Bil ta Garbi)</div>     </div>     </div>`)[0];
+                popup_0cb9b8ee60dd9d44769c41d7a6ac690e.setContent(html_a88fd5ba08bd91f9302231b9be7717b5);
+            
+        
+
+        circle_marker_e881e0d7b543921bdf8a149411580ea0.bindPopup(popup_0cb9b8ee60dd9d44769c41d7a6ac690e)
+        ;
+
+        
+    
+    
+            circle_marker_e881e0d7b543921bdf8a149411580ea0.bindTooltip(
+                `<div>
+                     Atelier Luzatu
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_dc960164f443df5fcfcb15ab1a107e76 = L.circleMarker(
+                [43.48914226266756, -1.432566287979827],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_41e7137e28626b13e6be20482f05a766 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_ad631c1b001a791b6d179012d9d10147 = $(`<div id="html_ad631c1b001a791b6d179012d9d10147" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Zone de fret</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_41e7137e28626b13e6be20482f05a766.setContent(html_ad631c1b001a791b6d179012d9d10147);
+            
+        
+
+        circle_marker_dc960164f443df5fcfcb15ab1a107e76.bindPopup(popup_41e7137e28626b13e6be20482f05a766)
+        ;
+
+        
+    
+    
+            circle_marker_dc960164f443df5fcfcb15ab1a107e76.bindTooltip(
+                `<div>
+                     Zone de fret
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e46257f08267ecdc1d461ae57475c85e = L.circleMarker(
+                [43.373978314644646, -0.9554060187520896],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_89f96928f870d108a950e73720d5d6d7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_288ee3496db924c7e2cd161cfa172d78 = $(`<div id="html_288ee3496db924c7e2cd161cfa172d78" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Le hangar d&#x27;Aima </div>         <div>Ressourcerie mobilier professionnel (propose quelques matériaux de construction)</div>     </div>     </div>`)[0];
+                popup_89f96928f870d108a950e73720d5d6d7.setContent(html_288ee3496db924c7e2cd161cfa172d78);
+            
+        
+
+        circle_marker_e46257f08267ecdc1d461ae57475c85e.bindPopup(popup_89f96928f870d108a950e73720d5d6d7)
+        ;
+
+        
+    
+    
+            circle_marker_e46257f08267ecdc1d461ae57475c85e.bindTooltip(
+                `<div>
+                     Le hangar d&#x27;Aima 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_87a49da76bd5009955233843108428df = L.circleMarker(
+                [43.343463564430905, -0.4163368722168425],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_03e8706b44c04b25b7636a06d5fb4d9e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2b59656aaf3b83067864223783bc5885 = $(`<div id="html_2b59656aaf3b83067864223783bc5885" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Emmaüs</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_03e8706b44c04b25b7636a06d5fb4d9e.setContent(html_2b59656aaf3b83067864223783bc5885);
+            
+        
+
+        circle_marker_87a49da76bd5009955233843108428df.bindPopup(popup_03e8706b44c04b25b7636a06d5fb4d9e)
+        ;
+
+        
+    
+    
+            circle_marker_87a49da76bd5009955233843108428df.bindTooltip(
+                `<div>
+                     Emmaüs
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_274f4e35cb109d0192d9eb9d12968d1e = L.circleMarker(
+                [43.17617373997914, -1.2523584853383174],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_5addd7ab4609441676f82a3054a37dd8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_41b3d83d157618a1d4be702f45f2ab06 = $(`<div id="html_41b3d83d157618a1d4be702f45f2ab06" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Recyclerie Lokala</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_5addd7ab4609441676f82a3054a37dd8.setContent(html_41b3d83d157618a1d4be702f45f2ab06);
+            
+        
+
+        circle_marker_274f4e35cb109d0192d9eb9d12968d1e.bindPopup(popup_5addd7ab4609441676f82a3054a37dd8)
+        ;
+
+        
+    
+    
+            circle_marker_274f4e35cb109d0192d9eb9d12968d1e.bindTooltip(
+                `<div>
+                     Recyclerie Lokala
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8eb3645bf0dc7ab10d87d3eb592d5ff9 = L.circleMarker(
+                [43.55105269687528, -1.401383957457269],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_2579f0253d1218c6336ab015aa898cdf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_aeda09a9aeaa89a0952f14fc1bef440f = $(`<div id="html_aeda09a9aeaa89a0952f14fc1bef440f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">ESAT Espérance château rouge </div>         <div>Recyclerie</div>     </div>     </div>`)[0];
+                popup_2579f0253d1218c6336ab015aa898cdf.setContent(html_aeda09a9aeaa89a0952f14fc1bef440f);
+            
+        
+
+        circle_marker_8eb3645bf0dc7ab10d87d3eb592d5ff9.bindPopup(popup_2579f0253d1218c6336ab015aa898cdf)
+        ;
+
+        
+    
+    
+            circle_marker_8eb3645bf0dc7ab10d87d3eb592d5ff9.bindTooltip(
+                `<div>
+                     ESAT Espérance château rouge 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_404b46eaea5122b6aa0375a44ad8155c = L.circleMarker(
+                [43.47663903850271, -0.9476831661268657],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_ae2a1cd643b6302c40cc86831a00a43e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9b37f2b712670493bdf5428e7320094c = $(`<div id="html_9b37f2b712670493bdf5428e7320094c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Le hangar d&#x27;Aima </div>         <div>Recyclerie</div>     </div>     </div>`)[0];
+                popup_ae2a1cd643b6302c40cc86831a00a43e.setContent(html_9b37f2b712670493bdf5428e7320094c);
+            
+        
+
+        circle_marker_404b46eaea5122b6aa0375a44ad8155c.bindPopup(popup_ae2a1cd643b6302c40cc86831a00a43e)
+        ;
+
+        
+    
+    
+            circle_marker_404b46eaea5122b6aa0375a44ad8155c.bindTooltip(
+                `<div>
+                     Le hangar d&#x27;Aima 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8b7e1589bf54d70e0de10653afd23595 = L.circleMarker(
+                [43.54607313657437, -1.491804526036701],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_98e7442d1cd3f210ccda4caf063b6a97 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c9eedcbe02756079a7575ec1441060f7 = $(`<div id="html_c9eedcbe02756079a7575ec1441060f7" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Items</div>         <div>Entreprise d&#x27;insertion sociale dans le domaine de l&#x27;éco construction..</div>     </div>     </div>`)[0];
+                popup_98e7442d1cd3f210ccda4caf063b6a97.setContent(html_c9eedcbe02756079a7575ec1441060f7);
+            
+        
+
+        circle_marker_8b7e1589bf54d70e0de10653afd23595.bindPopup(popup_98e7442d1cd3f210ccda4caf063b6a97)
+        ;
+
+        
+    
+    
+            circle_marker_8b7e1589bf54d70e0de10653afd23595.bindTooltip(
+                `<div>
+                     Items
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_63ea1bb23e39629254098075456fcc7b = L.circleMarker(
+                [43.5190797103983, -1.4169239337635124],
+                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#FF0000", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_053be2bbc41c130013758aacb9acb06f);
+        
+    
+        var popup_8f605b9ccc83b4181944df379f3d6c84 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a9ece831699dcaefa065de641a07bef7 = $(`<div id="html_a9ece831699dcaefa065de641a07bef7" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Emmaüs</div>         <div>Matériel informatique + électrique + menuiserie</div>     </div>     </div>`)[0];
+                popup_8f605b9ccc83b4181944df379f3d6c84.setContent(html_a9ece831699dcaefa065de641a07bef7);
+            
+        
+
+        circle_marker_63ea1bb23e39629254098075456fcc7b.bindPopup(popup_8f605b9ccc83b4181944df379f3d6c84)
+        ;
+
+        
+    
+    
+            circle_marker_63ea1bb23e39629254098075456fcc7b.bindTooltip(
+                `<div>
+                     Emmaüs
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_053be2bbc41c130013758aacb9acb06f.addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            var feature_group_891ffc6d48168d7f1bac4ab3177d4905 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_4472c26285a5ecd21a2a9e85be3c2452 = L.circleMarker(
+                [43.46264695895484, -1.5056265227388876],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_c536463462cd19553fbe6e2754a6172e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0818c142322a4af246f4d7abdcef1dea = $(`<div id="html_0818c142322a4af246f4d7abdcef1dea" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">CETRAID</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_c536463462cd19553fbe6e2754a6172e.setContent(html_0818c142322a4af246f4d7abdcef1dea);
+            
+        
+
+        circle_marker_4472c26285a5ecd21a2a9e85be3c2452.bindPopup(popup_c536463462cd19553fbe6e2754a6172e)
+        ;
+
+        
+    
+    
+            circle_marker_4472c26285a5ecd21a2a9e85be3c2452.bindTooltip(
+                `<div>
+                     CETRAID
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_283bbf0ec7a532066ab2bb0edef22bf0 = L.circleMarker(
+                [43.442201302735846, -1.0506795316833517],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_4a7266c9efd24d066bf3d95046b39af5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_79f801974709ed70edff5e19d58d74be = $(`<div id="html_79f801974709ed70edff5e19d58d74be" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">ISDI</div>         <div>Installations de Stockage des Déchets Inertes (ISDI) </div>     </div>     </div>`)[0];
+                popup_4a7266c9efd24d066bf3d95046b39af5.setContent(html_79f801974709ed70edff5e19d58d74be);
+            
+        
+
+        circle_marker_283bbf0ec7a532066ab2bb0edef22bf0.bindPopup(popup_4a7266c9efd24d066bf3d95046b39af5)
+        ;
+
+        
+    
+    
+            circle_marker_283bbf0ec7a532066ab2bb0edef22bf0.bindTooltip(
+                `<div>
+                     ISDI
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c7630054c74e1ce50c6ca2753dae7fdd = L.circleMarker(
+                [43.42654460078532, -1.4859969184258994],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_6d8cb135f5d3ad2d5686da2c3b19172b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e68c6ab4271c2b5e64a081fa3f6484a2 = $(`<div id="html_e68c6ab4271c2b5e64a081fa3f6484a2" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">CBA Matériaux</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_6d8cb135f5d3ad2d5686da2c3b19172b.setContent(html_e68c6ab4271c2b5e64a081fa3f6484a2);
+            
+        
+
+        circle_marker_c7630054c74e1ce50c6ca2753dae7fdd.bindPopup(popup_6d8cb135f5d3ad2d5686da2c3b19172b)
+        ;
+
+        
+    
+    
+            circle_marker_c7630054c74e1ce50c6ca2753dae7fdd.bindTooltip(
+                `<div>
+                     CBA Matériaux
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9ac4d92b1c49dfebc0fd3c20eac65e71 = L.circleMarker(
+                [43.45119327635525, -1.4966377227055816],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_5666a9f095501d9634a11210f1bb471d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9e22a03de8392edf4919df47fc51979f = $(`<div id="html_9e22a03de8392edf4919df47fc51979f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Etcheverry Mindurry</div>         <div>Collecte, traitement et valorisation des déchets, professionnels et particuliers</div>     </div>     </div>`)[0];
+                popup_5666a9f095501d9634a11210f1bb471d.setContent(html_9e22a03de8392edf4919df47fc51979f);
+            
+        
+
+        circle_marker_9ac4d92b1c49dfebc0fd3c20eac65e71.bindPopup(popup_5666a9f095501d9634a11210f1bb471d)
+        ;
+
+        
+    
+    
+            circle_marker_9ac4d92b1c49dfebc0fd3c20eac65e71.bindTooltip(
+                `<div>
+                     Etcheverry Mindurry
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2e26f8ae5853cb324f30e934ef75b7c2 = L.circleMarker(
+                [43.48984520487338, -1.4603322040232996],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_833a15c1fc499f02f5d65a18be758765 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4fb49d2c7cda0ac6c0592af30e8b2a5c = $(`<div id="html_4fb49d2c7cda0ac6c0592af30e8b2a5c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie Saint-Fréderic</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_833a15c1fc499f02f5d65a18be758765.setContent(html_4fb49d2c7cda0ac6c0592af30e8b2a5c);
+            
+        
+
+        circle_marker_2e26f8ae5853cb324f30e934ef75b7c2.bindPopup(popup_833a15c1fc499f02f5d65a18be758765)
+        ;
+
+        
+    
+    
+            circle_marker_2e26f8ae5853cb324f30e934ef75b7c2.bindTooltip(
+                `<div>
+                     Dechetterie Saint-Fréderic
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e0931a70ccd31f388f2542bd2e170518 = L.circleMarker(
+                [43.50466362645765, -1.4962094690066463],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_0b893ddb650ae41733cbd6b983d9bd0e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_aa5a3e1c66b03f2e452600fdd83816d9 = $(`<div id="html_aa5a3e1c66b03f2e452600fdd83816d9" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie du Pont de l&#x27;Aveugle</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_0b893ddb650ae41733cbd6b983d9bd0e.setContent(html_aa5a3e1c66b03f2e452600fdd83816d9);
+            
+        
+
+        circle_marker_e0931a70ccd31f388f2542bd2e170518.bindPopup(popup_0b893ddb650ae41733cbd6b983d9bd0e)
+        ;
+
+        
+    
+    
+            circle_marker_e0931a70ccd31f388f2542bd2e170518.bindTooltip(
+                `<div>
+                     Dechetterie du Pont de l&#x27;Aveugle
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9e49c62b257f8571899cc78c736ee498 = L.circleMarker(
+                [43.47197409427648, -1.5372810742459964],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_f34eedfc69ed4852eef006d1d2a1c1cf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f327c9774bf85b776c278fbf43591801 = $(`<div id="html_f327c9774bf85b776c278fbf43591801" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Déchetterie Ranquine</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_f34eedfc69ed4852eef006d1d2a1c1cf.setContent(html_f327c9774bf85b776c278fbf43591801);
+            
+        
+
+        circle_marker_9e49c62b257f8571899cc78c736ee498.bindPopup(popup_f34eedfc69ed4852eef006d1d2a1c1cf)
+        ;
+
+        
+    
+    
+            circle_marker_9e49c62b257f8571899cc78c736ee498.bindTooltip(
+                `<div>
+                     Déchetterie Ranquine
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_24b98095d3baa148f0830e90d2c688b4 = L.circleMarker(
+                [43.43971986031223, -1.5730267461182732],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_e82548dbf3d54fd894bde3408724a8aa = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_41d2b70c2ec591791cbb19e81a0af377 = $(`<div id="html_41d2b70c2ec591791cbb19e81a0af377" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Goyhetche</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_e82548dbf3d54fd894bde3408724a8aa.setContent(html_41d2b70c2ec591791cbb19e81a0af377);
+            
+        
+
+        circle_marker_24b98095d3baa148f0830e90d2c688b4.bindPopup(popup_e82548dbf3d54fd894bde3408724a8aa)
+        ;
+
+        
+    
+    
+            circle_marker_24b98095d3baa148f0830e90d2c688b4.bindTooltip(
+                `<div>
+                     Goyhetche
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_97594e80ea600374d2535ba566cb2b7b = L.circleMarker(
+                [43.444010637345166, -1.3248903647338963],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_a6fa1506feaebf87216f9124c2e3afb7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4e6aaf094fd77d3d6da5fceba12f1e12 = $(`<div id="html_4e6aaf094fd77d3d6da5fceba12f1e12" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Déchetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_a6fa1506feaebf87216f9124c2e3afb7.setContent(html_4e6aaf094fd77d3d6da5fceba12f1e12);
+            
+        
+
+        circle_marker_97594e80ea600374d2535ba566cb2b7b.bindPopup(popup_a6fa1506feaebf87216f9124c2e3afb7)
+        ;
+
+        
+    
+    
+            circle_marker_97594e80ea600374d2535ba566cb2b7b.bindTooltip(
+                `<div>
+                     Déchetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_10c836167ea6403b3ba26d0da22fdb5f = L.circleMarker(
+                [43.49028346695037, -1.0963204647002447],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_54ddb1b255bf01bd6daef6bcb9171958 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_bd47687dea9c325c365da9c9c38ce6a0 = $(`<div id="html_bd47687dea9c325c365da9c9c38ce6a0" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_54ddb1b255bf01bd6daef6bcb9171958.setContent(html_bd47687dea9c325c365da9c9c38ce6a0);
+            
+        
+
+        circle_marker_10c836167ea6403b3ba26d0da22fdb5f.bindPopup(popup_54ddb1b255bf01bd6daef6bcb9171958)
+        ;
+
+        
+    
+    
+            circle_marker_10c836167ea6403b3ba26d0da22fdb5f.bindTooltip(
+                `<div>
+                     Dechetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_00c41aa11f2d971a968ab701cef7ad9d = L.circleMarker(
+                [43.51333736607923, -1.1154519202363309],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_c6bd762166e5fbc28cc2ac700df58cd4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1236023de00259f243dce52af6dc76bf = $(`<div id="html_1236023de00259f243dce52af6dc76bf" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Loreki</div>         <div>Coopérative valorisation déchets organique : production de bois énergie</div>     </div>     </div>`)[0];
+                popup_c6bd762166e5fbc28cc2ac700df58cd4.setContent(html_1236023de00259f243dce52af6dc76bf);
+            
+        
+
+        circle_marker_00c41aa11f2d971a968ab701cef7ad9d.bindPopup(popup_c6bd762166e5fbc28cc2ac700df58cd4)
+        ;
+
+        
+    
+    
+            circle_marker_00c41aa11f2d971a968ab701cef7ad9d.bindTooltip(
+                `<div>
+                     Loreki
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_10a7b0357802505bc86bb7785f8b8a3b = L.circleMarker(
+                [43.30425251334175, -1.227329441556975],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_39d04fd97e4487a4a88878258b03edf3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_dcf025dd7d8880880cf7767300b6c891 = $(`<div id="html_dcf025dd7d8880880cf7767300b6c891" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Déchetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_39d04fd97e4487a4a88878258b03edf3.setContent(html_dcf025dd7d8880880cf7767300b6c891);
+            
+        
+
+        circle_marker_10a7b0357802505bc86bb7785f8b8a3b.bindPopup(popup_39d04fd97e4487a4a88878258b03edf3)
+        ;
+
+        
+    
+    
+            circle_marker_10a7b0357802505bc86bb7785f8b8a3b.bindTooltip(
+                `<div>
+                     Déchetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c78e0fd9b4745aa8fc76a3620ce2e1ab = L.circleMarker(
+                [43.327464104356, -1.3947617508187806],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_f90b008b7392a4bfaede7e70a9c37ace = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_68fdfdef18d0da3f18739bb778d9b31a = $(`<div id="html_68fdfdef18d0da3f18739bb778d9b31a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Erobil</div>         <div>Ressourcerie</div>     </div>     </div>`)[0];
+                popup_f90b008b7392a4bfaede7e70a9c37ace.setContent(html_68fdfdef18d0da3f18739bb778d9b31a);
+            
+        
+
+        circle_marker_c78e0fd9b4745aa8fc76a3620ce2e1ab.bindPopup(popup_f90b008b7392a4bfaede7e70a9c37ace)
+        ;
+
+        
+    
+    
+            circle_marker_c78e0fd9b4745aa8fc76a3620ce2e1ab.bindTooltip(
+                `<div>
+                     Erobil
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_39e68b4c6b268f93f3aad4ac63f8467e = L.circleMarker(
+                [43.34729836172698, -1.4178126490737493],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_46b4d4b10cc39389fd0682091a6488df = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_ad82499228f9b44f976ce8bdd72c2fac = $(`<div id="html_ad82499228f9b44f976ce8bdd72c2fac" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Déchetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_46b4d4b10cc39389fd0682091a6488df.setContent(html_ad82499228f9b44f976ce8bdd72c2fac);
+            
+        
+
+        circle_marker_39e68b4c6b268f93f3aad4ac63f8467e.bindPopup(popup_46b4d4b10cc39389fd0682091a6488df)
+        ;
+
+        
+    
+    
+            circle_marker_39e68b4c6b268f93f3aad4ac63f8467e.bindTooltip(
+                `<div>
+                     Déchetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8901fec5768f30a387dbdf8c6b04cb7e = L.circleMarker(
+                [43.347547498250165, -1.4175932187712288],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_2352bacc532808dd1566079b7ea53d1b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_18cdeba15ce3f1f768bb34d50b8e47cf = $(`<div id="html_18cdeba15ce3f1f768bb34d50b8e47cf" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Loreki</div>         <div>Coopérative valorisation déchets organique : plateforme de compostage</div>     </div>     </div>`)[0];
+                popup_2352bacc532808dd1566079b7ea53d1b.setContent(html_18cdeba15ce3f1f768bb34d50b8e47cf);
+            
+        
+
+        circle_marker_8901fec5768f30a387dbdf8c6b04cb7e.bindPopup(popup_2352bacc532808dd1566079b7ea53d1b)
+        ;
+
+        
+    
+    
+            circle_marker_8901fec5768f30a387dbdf8c6b04cb7e.bindTooltip(
+                `<div>
+                     Loreki
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_48e1b344431fa25e64feabaf2e630ce0 = L.circleMarker(
+                [43.56184110861998, -1.5018914928046738],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_77e3d08b37dd67fea3dcbe49eaa6f85c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_36a5f0a2fd3a11c90bd3f977909a7dd8 = $(`<div id="html_36a5f0a2fd3a11c90bd3f977909a7dd8" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Tri&#x27;n&#x27;collect</div>         <div>Tri à la source, collecte et recyclage des déchets de chantier </div>     </div>     </div>`)[0];
+                popup_77e3d08b37dd67fea3dcbe49eaa6f85c.setContent(html_36a5f0a2fd3a11c90bd3f977909a7dd8);
+            
+        
+
+        circle_marker_48e1b344431fa25e64feabaf2e630ce0.bindPopup(popup_77e3d08b37dd67fea3dcbe49eaa6f85c)
+        ;
+
+        
+    
+    
+            circle_marker_48e1b344431fa25e64feabaf2e630ce0.bindTooltip(
+                `<div>
+                     Tri&#x27;n&#x27;collect
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b89ae8701d37742bcf77558b806cd150 = L.circleMarker(
+                [43.48977634584413, -1.4329183210293068],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_added991d1747a16559b11c26e93d226 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_77fb21c92de0982751fb576d8b80a966 = $(`<div id="html_77fb21c92de0982751fb576d8b80a966" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Suez</div>         <div>Collecte et recyclage de déchets industriels</div>     </div>     </div>`)[0];
+                popup_added991d1747a16559b11c26e93d226.setContent(html_77fb21c92de0982751fb576d8b80a966);
+            
+        
+
+        circle_marker_b89ae8701d37742bcf77558b806cd150.bindPopup(popup_added991d1747a16559b11c26e93d226)
+        ;
+
+        
+    
+    
+            circle_marker_b89ae8701d37742bcf77558b806cd150.bindTooltip(
+                `<div>
+                     Suez
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2aab3f440a4b6aaf5e5ed5fb204dbdcd = L.circleMarker(
+                [43.20536979229856, -0.6344062958522406],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_f2c5259043ee60cf561eb340d150d1b3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_934ab6720065217e7640cf9cabf8a9fb = $(`<div id="html_934ab6720065217e7640cf9cabf8a9fb" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Laborde </div>         <div>Concassage et revalorisation des déchets de chantier</div>     </div>     </div>`)[0];
+                popup_f2c5259043ee60cf561eb340d150d1b3.setContent(html_934ab6720065217e7640cf9cabf8a9fb);
+            
+        
+
+        circle_marker_2aab3f440a4b6aaf5e5ed5fb204dbdcd.bindPopup(popup_f2c5259043ee60cf561eb340d150d1b3)
+        ;
+
+        
+    
+    
+            circle_marker_2aab3f440a4b6aaf5e5ed5fb204dbdcd.bindTooltip(
+                `<div>
+                     Laborde 
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0b1b6e780bc698ee92dea3b634fa3683 = L.circleMarker(
+                [43.204863254710496, -0.6310990238650758],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_f3b40b690568c6ccde513bfa087db69b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8ec432b88ac62a969588d8a836579bf4 = $(`<div id="html_8ec432b88ac62a969588d8a836579bf4" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Périsser</div>         <div>Collecte, recyclage, valorisation déchets fers, métaux</div>     </div>     </div>`)[0];
+                popup_f3b40b690568c6ccde513bfa087db69b.setContent(html_8ec432b88ac62a969588d8a836579bf4);
+            
+        
+
+        circle_marker_0b1b6e780bc698ee92dea3b634fa3683.bindPopup(popup_f3b40b690568c6ccde513bfa087db69b)
+        ;
+
+        
+    
+    
+            circle_marker_0b1b6e780bc698ee92dea3b634fa3683.bindTooltip(
+                `<div>
+                     Périsser
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0c75adf8d774d82b5a1c81b65a69d5dd = L.circleMarker(
+                [43.52103731578841, -0.8838768800222941],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_bce2688b25dad2540b42215a94401074 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_07165b3400bf0193891615ffd8ce7480 = $(`<div id="html_07165b3400bf0193891615ffd8ce7480" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">BLTP recycle</div>         <div>Valorisation vos déchets inertes pour les pros</div>     </div>     </div>`)[0];
+                popup_bce2688b25dad2540b42215a94401074.setContent(html_07165b3400bf0193891615ffd8ce7480);
+            
+        
+
+        circle_marker_0c75adf8d774d82b5a1c81b65a69d5dd.bindPopup(popup_bce2688b25dad2540b42215a94401074)
+        ;
+
+        
+    
+    
+            circle_marker_0c75adf8d774d82b5a1c81b65a69d5dd.bindTooltip(
+                `<div>
+                     BLTP recycle
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_acdc9a2da95aee67509d3ae37cabd321 = L.circleMarker(
+                [43.32209755487328, -1.0442143574126077],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_d1ccf09a990cdf165cc07d33892dadbe = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_202b0e92ff1a17944489552bbe94976e = $(`<div id="html_202b0e92ff1a17944489552bbe94976e" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie</div>         <div>Ouverte aux pros</div>     </div>     </div>`)[0];
+                popup_d1ccf09a990cdf165cc07d33892dadbe.setContent(html_202b0e92ff1a17944489552bbe94976e);
+            
+        
+
+        circle_marker_acdc9a2da95aee67509d3ae37cabd321.bindPopup(popup_d1ccf09a990cdf165cc07d33892dadbe)
+        ;
+
+        
+    
+    
+            circle_marker_acdc9a2da95aee67509d3ae37cabd321.bindTooltip(
+                `<div>
+                     Dechetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_19da669a653caf773ca6f1d3d1d2b4a0 = L.circleMarker(
+                [43.40706168187147, -1.6172284710779925],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_d94c8d86727c9cb2176bb509bf0e88cc = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2dfcd8898b7c8d3f973a34b4949b6575 = $(`<div id="html_2dfcd8898b7c8d3f973a34b4949b6575" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Artola</div>         <div>Collecte et recyclage des déchets du BTP + location de bennes</div>     </div>     </div>`)[0];
+                popup_d94c8d86727c9cb2176bb509bf0e88cc.setContent(html_2dfcd8898b7c8d3f973a34b4949b6575);
+            
+        
+
+        circle_marker_19da669a653caf773ca6f1d3d1d2b4a0.bindPopup(popup_d94c8d86727c9cb2176bb509bf0e88cc)
+        ;
+
+        
+    
+    
+            circle_marker_19da669a653caf773ca6f1d3d1d2b4a0.bindTooltip(
+                `<div>
+                     Artola
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ecc833d367af67ed410887fc03833f3a = L.circleMarker(
+                [43.33603277045399, -1.461454224252646],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_60061032458ad7bb5ccda207b51bcff1 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4afab3d3292202971881d5806734d4f4 = $(`<div id="html_4afab3d3292202971881d5806734d4f4" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_60061032458ad7bb5ccda207b51bcff1.setContent(html_4afab3d3292202971881d5806734d4f4);
+            
+        
+
+        circle_marker_ecc833d367af67ed410887fc03833f3a.bindPopup(popup_60061032458ad7bb5ccda207b51bcff1)
+        ;
+
+        
+    
+    
+            circle_marker_ecc833d367af67ed410887fc03833f3a.bindTooltip(
+                `<div>
+                     Dechetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_13887e828fc50454c5f1d965a4cef1ea = L.circleMarker(
+                [43.53860698918235, -1.498097264665212],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_e999df3a9f11b965e2831307e3b6fe96 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0fb503a170df4a17d218115c794e7998 = $(`<div id="html_0fb503a170df4a17d218115c794e7998" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_e999df3a9f11b965e2831307e3b6fe96.setContent(html_0fb503a170df4a17d218115c794e7998);
+            
+        
+
+        circle_marker_13887e828fc50454c5f1d965a4cef1ea.bindPopup(popup_e999df3a9f11b965e2831307e3b6fe96)
+        ;
+
+        
+    
+    
+            circle_marker_13887e828fc50454c5f1d965a4cef1ea.bindTooltip(
+                `<div>
+                     Dechetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_94be05e07e92aab3d1d2c47ab3faa795 = L.circleMarker(
+                [43.35271288306219, -1.7394619261775648],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_2810a0d9b27d740e28a3ef9e70182b3e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_062337c75a104b69ed650f2888eab68b = $(`<div id="html_062337c75a104b69ed650f2888eab68b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Bidexka</div>         <div>Plateforme de valorisation et de stockage des déchets inertes (Bil ta Garbi)</div>     </div>     </div>`)[0];
+                popup_2810a0d9b27d740e28a3ef9e70182b3e.setContent(html_062337c75a104b69ed650f2888eab68b);
+            
+        
+
+        circle_marker_94be05e07e92aab3d1d2c47ab3faa795.bindPopup(popup_2810a0d9b27d740e28a3ef9e70182b3e)
+        ;
+
+        
+    
+    
+            circle_marker_94be05e07e92aab3d1d2c47ab3faa795.bindTooltip(
+                `<div>
+                     Bidexka
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bcb399c468ca794baa7a8a65c8a0bff6 = L.circleMarker(
+                [43.47324334411015, -1.279501818679908],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_d9374b4507b6ddf32eb446bf65477c63 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_531e44baf85d914c8285e5e2eb03c911 = $(`<div id="html_531e44baf85d914c8285e5e2eb03c911" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Coreval</div>         <div>Plateforme de valorisation des inertes </div>     </div>     </div>`)[0];
+                popup_d9374b4507b6ddf32eb446bf65477c63.setContent(html_531e44baf85d914c8285e5e2eb03c911);
+            
+        
+
+        circle_marker_bcb399c468ca794baa7a8a65c8a0bff6.bindPopup(popup_d9374b4507b6ddf32eb446bf65477c63)
+        ;
+
+        
+    
+    
+            circle_marker_bcb399c468ca794baa7a8a65c8a0bff6.bindTooltip(
+                `<div>
+                     Coreval
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d291eb9e91efe511ea49b7ee1e29c4e4 = L.circleMarker(
+                [43.40624197759258, -1.4498872454137],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_c1b11eb9efcd97aca42d582468ffb141 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_84ac4976b7e6a35991a8cd3591f8696b = $(`<div id="html_84ac4976b7e6a35991a8cd3591f8696b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Dechetterie</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_c1b11eb9efcd97aca42d582468ffb141.setContent(html_84ac4976b7e6a35991a8cd3591f8696b);
+            
+        
+
+        circle_marker_d291eb9e91efe511ea49b7ee1e29c4e4.bindPopup(popup_c1b11eb9efcd97aca42d582468ffb141)
+        ;
+
+        
+    
+    
+            circle_marker_d291eb9e91efe511ea49b7ee1e29c4e4.bindTooltip(
+                `<div>
+                     Dechetterie
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_feca0c3be0ed22231b2c7e0d6460b60b = L.circleMarker(
+                [43.10430806973351, -0.892595193729135],
+                {"bubblingMouseEvents": true, "color": "#0000FF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#0000FF", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_891ffc6d48168d7f1bac4ab3177d4905);
+        
+    
+        var popup_00707f11356fc16c358fe341ede5adb9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_923c772a45c8665e7011c8fffeddbe07 = $(`<div id="html_923c772a45c8665e7011c8fffeddbe07" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Garicoix</div>         <div>Déchets fers et métaux récuperation recyclage valorisation</div>     </div>     </div>`)[0];
+                popup_00707f11356fc16c358fe341ede5adb9.setContent(html_923c772a45c8665e7011c8fffeddbe07);
+            
+        
+
+        circle_marker_feca0c3be0ed22231b2c7e0d6460b60b.bindPopup(popup_00707f11356fc16c358fe341ede5adb9)
+        ;
+
+        
+    
+    
+            circle_marker_feca0c3be0ed22231b2c7e0d6460b60b.bindTooltip(
+                `<div>
+                     Garicoix
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_891ffc6d48168d7f1bac4ab3177d4905.addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            var feature_group_aeba181a80962c356df488aad78dae74 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_525694b3ebfb12d9698a733996274c4e = L.circleMarker(
+                [43.47386576331151, -1.5055390419857897],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_1dc257178d3468106bb09e870e0c4769 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_58ff3354ac004fb80bca10e7ba4c8d7c = $(`<div id="html_58ff3354ac004fb80bca10e7ba4c8d7c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_1dc257178d3468106bb09e870e0c4769.setContent(html_58ff3354ac004fb80bca10e7ba4c8d7c);
+            
+        
+
+        circle_marker_525694b3ebfb12d9698a733996274c4e.bindPopup(popup_1dc257178d3468106bb09e870e0c4769)
+        ;
+
+        
+    
+    
+            circle_marker_525694b3ebfb12d9698a733996274c4e.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_43d23435b0ef218e95528410d10bd132 = L.circleMarker(
+                [43.39128848652839, -1.2982756822871082],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_fd5e039006d39f9b670ab8b85e2ff750 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9daf82af27b78d40658b33e69d62d45a = $(`<div id="html_9daf82af27b78d40658b33e69d62d45a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_fd5e039006d39f9b670ab8b85e2ff750.setContent(html_9daf82af27b78d40658b33e69d62d45a);
+            
+        
+
+        circle_marker_43d23435b0ef218e95528410d10bd132.bindPopup(popup_fd5e039006d39f9b670ab8b85e2ff750)
+        ;
+
+        
+    
+    
+            circle_marker_43d23435b0ef218e95528410d10bd132.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ab0887f7f3a5ed858b5e34724e4e7eb6 = L.circleMarker(
+                [43.178597400065016, -0.9187954080880566],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_c32c57421c09c30b6db794e19f0bee7f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a9d922bb21fa994e85987b93d04fb291 = $(`<div id="html_a9d922bb21fa994e85987b93d04fb291" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_c32c57421c09c30b6db794e19f0bee7f.setContent(html_a9d922bb21fa994e85987b93d04fb291);
+            
+        
+
+        circle_marker_ab0887f7f3a5ed858b5e34724e4e7eb6.bindPopup(popup_c32c57421c09c30b6db794e19f0bee7f)
+        ;
+
+        
+    
+    
+            circle_marker_ab0887f7f3a5ed858b5e34724e4e7eb6.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4232b8fb8cbda0195a89ea6e3479ab43 = L.circleMarker(
+                [43.25590327771541, -1.2201817767902894],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_4ed39ce6583ad2340a46f2db1f5a6334 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6248ba19b2352168c25b8005bea47998 = $(`<div id="html_6248ba19b2352168c25b8005bea47998" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_4ed39ce6583ad2340a46f2db1f5a6334.setContent(html_6248ba19b2352168c25b8005bea47998);
+            
+        
+
+        circle_marker_4232b8fb8cbda0195a89ea6e3479ab43.bindPopup(popup_4ed39ce6583ad2340a46f2db1f5a6334)
+        ;
+
+        
+    
+    
+            circle_marker_4232b8fb8cbda0195a89ea6e3479ab43.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9ca500a7bc6e979ad25efa5680ffd395 = L.circleMarker(
+                [43.21960693803303, -0.8818065825095451],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_a3fe37203dfce2558c9001cb33d15c4d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c426f636aa7526b42e91689c9d6e6d8f = $(`<div id="html_c426f636aa7526b42e91689c9d6e6d8f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_a3fe37203dfce2558c9001cb33d15c4d.setContent(html_c426f636aa7526b42e91689c9d6e6d8f);
+            
+        
+
+        circle_marker_9ca500a7bc6e979ad25efa5680ffd395.bindPopup(popup_a3fe37203dfce2558c9001cb33d15c4d)
+        ;
+
+        
+    
+    
+            circle_marker_9ca500a7bc6e979ad25efa5680ffd395.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_09bc38fc2ea97f6c81d644b0c94da216 = L.circleMarker(
+                [43.16231878651503, -1.242582365050028],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_feab2b1513d4b701a33a4a95fa885db4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_72433fb6954363ee0a49b25283aadacd = $(`<div id="html_72433fb6954363ee0a49b25283aadacd" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">-- Lieu stratégique --</div>         <div>nan</div>     </div>     </div>`)[0];
+                popup_feab2b1513d4b701a33a4a95fa885db4.setContent(html_72433fb6954363ee0a49b25283aadacd);
+            
+        
+
+        circle_marker_09bc38fc2ea97f6c81d644b0c94da216.bindPopup(popup_feab2b1513d4b701a33a4a95fa885db4)
+        ;
+
+        
+    
+    
+            circle_marker_09bc38fc2ea97f6c81d644b0c94da216.bindTooltip(
+                `<div>
+                     -- Lieu stratégique --
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d55d997bc03abbe939fb612b4dd46970 = L.circleMarker(
+                [43.53547302750488, -1.495330594995266],
+                {"bubblingMouseEvents": true, "color": "#00B050", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00B050", "fillOpacity": 0.9, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_aeba181a80962c356df488aad78dae74);
+        
+    
+        var popup_ced6f23604d534b1b98ac8791454f1bb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_56b64a7655b342c6592e7017e9d084ed = $(`<div id="html_56b64a7655b342c6592e7017e9d084ed" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <div style="font-weight:600; margin-bottom:4px;">Port de Tarnos</div>         <div>Lieu de stockage souhaité</div>     </div>     </div>`)[0];
+                popup_ced6f23604d534b1b98ac8791454f1bb.setContent(html_56b64a7655b342c6592e7017e9d084ed);
+            
+        
+
+        circle_marker_d55d997bc03abbe939fb612b4dd46970.bindPopup(popup_ced6f23604d534b1b98ac8791454f1bb)
+        ;
+
+        
+    
+    
+            circle_marker_d55d997bc03abbe939fb612b4dd46970.bindTooltip(
+                `<div>
+                     Port de Tarnos
+                 </div>`,
+                {
+  "permanent": true,
+  "direction": "right",
+  "opacity": 0.9,
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_aeba181a80962c356df488aad78dae74.addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+        
+    
+            map_cd7285a65b7cd0ca325b8d6c5a423460.fitBounds(
+                [[43.46264695895484, -1.5056265227388876], [43.46264695895484, -1.5056265227388876], [43.47386576331151, -1.5055390419857897], [43.52604333336027, -1.507389698250533], [43.48837475701547, -1.5265234819604974], [43.442201302735846, -1.0506795316833517], [43.42654460078532, -1.4859969184258994], [43.42654460078532, -1.4859969184258994], [43.45119327635525, -1.4966377227055816], [43.48984520487338, -1.4603322040232996], [43.50466362645765, -1.4962094690066463], [43.47197409427648, -1.5372810742459964], [43.43971986031223, -1.5730267461182732], [43.43971986031223, -1.5730267461182732], [43.444010637345166, -1.3248903647338963], [43.49028346695037, -1.0963204647002447], [43.50984905150089, -1.1116287220901873], [43.40273847409237, -0.9246408150634768], [43.23083267894979, -0.8836844753737944], [43.43103591645453, -1.5730524493990683], [43.39128848652839, -1.2982756822871082], [43.48914226266756, -1.432566287979827], [43.51333736607923, -1.1154519202363309], [43.30425251334175, -1.227329441556975], [43.178597400065016, -0.9187954080880566], [43.25590327771541, -1.2201817767902894], [43.25817994002816, -1.2258655075392677], [43.25419180974652, -1.2229681476907357], [43.327464104356, -1.3947617508187806], [43.327464104356, -1.3947617508187806], [43.34729836172698, -1.4178126490737493], [43.347547498250165, -1.4175932187712288], [43.56184110861998, -1.5018914928046738], [43.48977634584413, -1.4329183210293068], [43.492716499856776, -1.4235968915521846], [43.3317881419234, -1.330439022835551], [43.21960693803303, -0.8818065825095451], [43.48914226266756, -1.432566287979827], [43.20536979229856, -0.6344062958522406], [43.204863254710496, -0.6310990238650758], [43.373978314644646, -0.9554060187520896], [43.373978314644646, -0.9554060187520896], [43.343463564430905, -0.4163368722168425], [43.52103731578841, -0.8838768800222941], [43.17617373997914, -1.2523584853383174], [43.16231878651503, -1.242582365050028], [43.32209755487328, -1.0442143574126077], [43.40706168187147, -1.6172284710779925], [43.40607190156922, -1.621541462604582], [43.55105269687528, -1.401383957457269], [43.543156388639936, -1.3711482251909888], [43.47663903850271, -0.9476831661268657], [43.47663903850271, -0.9476831661268657], [43.33603277045399, -1.461454224252646], [43.53547302750488, -1.495330594995266], [43.53547302750488, -1.495330594995266], [43.53860698918235, -1.498097264665212], [43.54607313657437, -1.491804526036701], [43.5190797103983, -1.4169239337635124], [43.35271288306219, -1.7394619261775648], [43.47324334411015, -1.279501818679908], [43.40624197759258, -1.4498872454137], [43.10430806973351, -0.892595193729135]],
+                {"padding": [30, 30]}
+            );
+        
+    
+            var layer_control_54427191a29f0ec457e7c6109035937d_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_3271ae8fea6d3fdf71f8c5f9b3d2ee7d,
+                },
+                overlays :  {
+                    "O\u00f9 j\u0027apporte mes d\u00e9chets" : feature_group_2a16e65bed95597a1dd603cc603001a5,
+                    "Lieux d\u0027\u00e9conomie circulaire" : feature_group_053be2bbc41c130013758aacb9acb06f,
+                    "O\u00f9 je m\u0027approvisionne" : feature_group_891ffc6d48168d7f1bac4ab3177d4905,
+                    "Lieux strat\u00e9giques pour un acteur de l\u0027Economie Circulaire" : feature_group_aeba181a80962c356df488aad78dae74,
+                },
+            };
+            let layer_control_54427191a29f0ec457e7c6109035937d = L.control.layers(
+                layer_control_54427191a29f0ec457e7c6109035937d_layers.base_layers,
+                layer_control_54427191a29f0ec457e7c6109035937d_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_cd7285a65b7cd0ca325b8d6c5a423460);
+
+        
+</script>
+</html>
