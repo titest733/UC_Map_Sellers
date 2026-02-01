@@ -1,121 +1,1504 @@
-import pandas as pd
-import folium
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a319fa214a0c0f4015eefb8c26bcf46c {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
 
-# --- PARAMÈTRES ---
-EXCEL_PATH = "BDD_acteurs.xlsx"
-OUTPUT_HTML = "carte_acteurs.html"
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
 
-# --- LECTURE DU FICHIER ---
-df = pd.read_excel(EXCEL_PATH)
-df = df.fillna("-")
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
 
-df["Couleur de point"] = (
-    df["Couleur de point"]
-    .astype(str)
-    .str.replace(".0", "", regex=False)
-    .str.strip()
-)
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
 
-# --- CENTRAGE DE LA CARTE ---
-coords = df["PointGPX"].str.split(",", expand=True).astype(float)
-map_center = [coords[0].mean(), coords[1].mean()]
-
-# --- CARTE ---
-m = folium.Map(
-    location=map_center,
-    zoom_start=7,
-    tiles="CartoDB positron"
-)
-
-# --- CATÉGORIES ---
-categories = {
-    "0": {
-        "label": "Nobatek",
-        "color": "orange",
-        "icon": "university"
-    },
-    "1": {
-        "label": "Vente de matériaux de réemploi",
-        "color": "blue",
-        "icon": "shopping-cart"
-    },
-    "2": {
-        "label": "Vente + Dépose soignée",
-        "color": "red",
-        "icon": "wrench"
-    },
-    "3": {
-        "label": "Vente + Dépose + Reconditionnement",
-        "color": "green",
-        "icon": "recycle"
-    },
-    "4": {
-        "label": "Vente de matériaux anciens",
-        "color": "gray",
-        "icon": "archive"
-    }
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_a319fa214a0c0f4015eefb8c26bcf46c" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a319fa214a0c0f4015eefb8c26bcf46c = L.map(
+                "map_a319fa214a0c0f4015eefb8c26bcf46c",
+                {
+                    center: [44.67110445821972, -0.5229378506484336],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 7,
+  "zoomControl": true,
+  "preferCanvas": false,
 }
 
-# --- CRÉATION DES CALQUES (SANS NOBATEK) ---
-layers = {}
+                }
+            );
 
-for key, cat in categories.items():
+            
 
-    # ❌ Nobatek exclu du panneau de cases à cocher
-    if key == "0":
-        continue
+        
+    
+            var tile_layer_66f6c5dacb80d00c6644ea39088b0aff = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
 
-    layers[key] = folium.FeatureGroup(
-        name=f"<i class='fa fa-{cat['icon']}'></i> {cat['label']}",
-        show=True
-    )
-    m.add_child(layers[key])
+            );
+        
+    
+            tile_layer_66f6c5dacb80d00c6644ea39088b0aff.addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var feature_group_c73c21df320eaec3c984fe8bdb07ec81 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_517ad6e171adc1c74c66115237231c5b = L.marker(
+                [44.581482554065786, 0.9918878928973502],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_ea3a739db43274791e791486b7732236 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_203d2165c23bfe3f2465591d2bc91338 = L.popup({
+  "maxWidth": 350,
+});
 
-# --- AJOUT DES POINTS ---
-for _, row in df.iterrows():
+        
+            
+                var html_9cff9af6ac5fab0e23f2651af6b539db = $(`<div id="html_9cff9af6ac5fab0e23f2651af6b539db" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Amicale de l'Obsolescence Déprogrammée (AOD)</h4>         <b>Ressourcerie</b><br><br>         📞 07 57 18 39 44<br>         📍 1767 avenue du périgord BLANQUEFORT-SUR-BRIOLANCE (47 500)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_203d2165c23bfe3f2465591d2bc91338.setContent(html_9cff9af6ac5fab0e23f2651af6b539db);
+            
+        
 
-    lat, lon = map(float, row["PointGPX"].split(","))
-    cat_key = row["Couleur de point"]
-    cat = categories.get(cat_key)
+        marker_517ad6e171adc1c74c66115237231c5b.bindPopup(popup_203d2165c23bfe3f2465591d2bc91338)
+        ;
 
-    color = cat["color"] if cat else "gray"
-    icon = cat["icon"] if cat else "question-circle"
+        
+    
+    
+            marker_517ad6e171adc1c74c66115237231c5b.bindTooltip(
+                `<div>
+                     Amicale de l'Obsolescence Déprogrammée (AOD)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_517ad6e171adc1c74c66115237231c5b.setIcon(icon_ea3a739db43274791e791486b7732236);
+            
+    
+            var marker_916e2867332d5d45676a89ee4d5c0b86 = L.marker(
+                [44.325, -0.75],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_567ccb274be3c6d3c72192cd9b4a5e7e = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_6b3b192cc3cdda4dc7b187599748dcbe = L.popup({
+  "maxWidth": 350,
+});
 
-    popup_html = f"""
-    <div style="font-family: Arial; font-size: 13px;">
-        <h4>{row['Nom entreprise']}</h4>
-        <b>{row['Dénomination']}</b><br><br>
-        📞 {row['Contact']}<br>
-        📍 {row['Adresse']}<br><br>
-        <b>Activité :</b><br>{row['Activité']}<br>
-    </div>
-    """
+        
+            
+                var html_588199d09be5e8f4a4122edcea1dbf74 = $(`<div id="html_588199d09be5e8f4a4122edcea1dbf74" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Bâthestia Récup'</h4>         <b>Mathériauthèque ;Atelier de démantèllement des menuiseries bois/double vitrage </b><br><br>         📞 06 87 72 64 90<br>         📍 Lieu-dit La gare 40410 Moustey<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_6b3b192cc3cdda4dc7b187599748dcbe.setContent(html_588199d09be5e8f4a4122edcea1dbf74);
+            
+        
 
-    marker = folium.Marker(
-        location=[lat, lon],
-        tooltip=row["Nom entreprise"],
-        popup=folium.Popup(popup_html, max_width=350),
-        icon=folium.Icon(
-            color=color,
-            icon=icon,
-            prefix="fa"
-        )
-    )
+        marker_916e2867332d5d45676a89ee4d5c0b86.bindPopup(popup_6b3b192cc3cdda4dc7b187599748dcbe)
+        ;
 
-    # 👉 Ajout uniquement aux calques visibles
-    if cat_key in layers:
-        marker.add_to(layers[cat_key])
-    else:
-        # Nobatek et non classés restent visibles sur la carte
-        marker.add_to(m)
+        
+    
+    
+            marker_916e2867332d5d45676a89ee4d5c0b86.bindTooltip(
+                `<div>
+                     Bâthestia Récup'
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_916e2867332d5d45676a89ee4d5c0b86.setIcon(icon_567ccb274be3c6d3c72192cd9b4a5e7e);
+            
+    
+            var marker_4a8599fb7c0fc20459e8dffeff04c352 = L.marker(
+                [43.524438091001024, -1.1739904034913433],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_ba89bdc5fc2ce077e5dbf61828774ef9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_1f37ffce67acf94b28fecdb5a516c84e = L.popup({
+  "maxWidth": 350,
+});
 
-# --- AJOUT DES CALQUES À LA CARTE ---
-for layer in layers.values():
-    layer.add_to(m)
+        
+            
+                var html_f8c71f3f93dd1da6ab3baa3fab2ff474 = $(`<div id="html_f8c71f3f93dd1da6ab3baa3fab2ff474" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Bati circulaire </h4>         <b>Association</b><br><br>         📞 06 67 60 23 28<br>         📍 Route de Saint-Jean SAMES (64 520)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi sur leboncoin<br>     </div>     </div>`)[0];
+                popup_1f37ffce67acf94b28fecdb5a516c84e.setContent(html_f8c71f3f93dd1da6ab3baa3fab2ff474);
+            
+        
 
-# --- PANNEAU DE CASES À COCHER ---
-folium.LayerControl(collapsed=False).add_to(m)
+        marker_4a8599fb7c0fc20459e8dffeff04c352.bindPopup(popup_1f37ffce67acf94b28fecdb5a516c84e)
+        ;
 
-# --- EXPORT ---
-m.save(OUTPUT_HTML)
-print(f"Carte générée : {OUTPUT_HTML}")
+        
+    
+    
+            marker_4a8599fb7c0fc20459e8dffeff04c352.bindTooltip(
+                `<div>
+                     Bati circulaire 
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4a8599fb7c0fc20459e8dffeff04c352.setIcon(icon_ba89bdc5fc2ce077e5dbf61828774ef9);
+            
+    
+            var marker_d458310e788bf0c0dce1fdc22ed6a235 = L.marker(
+                [43.4376, -1.59127],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_4ce5c53e79ba3288172ded7d9ae85c21 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3de36e55363bb3908199d144efff6362 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_39965c620eed30ef719d678a6a3ee82a = $(`<div id="html_39965c620eed30ef719d678a6a3ee82a" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>BatRecup</h4>         <b>Plateforme de réemploi</b><br><br>         📞 06 66 37 95 19<br>         📍 3 impasse des Violettes 64210 Bidart<br><br>         <b>Activité :</b><br>Market place de vente de matériaux <br>     </div>     </div>`)[0];
+                popup_3de36e55363bb3908199d144efff6362.setContent(html_39965c620eed30ef719d678a6a3ee82a);
+            
+        
+
+        marker_d458310e788bf0c0dce1fdc22ed6a235.bindPopup(popup_3de36e55363bb3908199d144efff6362)
+        ;
+
+        
+    
+    
+            marker_d458310e788bf0c0dce1fdc22ed6a235.bindTooltip(
+                `<div>
+                     BatRecup
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_d458310e788bf0c0dce1fdc22ed6a235.setIcon(icon_4ce5c53e79ba3288172ded7d9ae85c21);
+            
+    
+            var marker_da44f18dd9c5953e92782b3ce4a7b243 = L.marker(
+                [46.158, -1.15],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_ab7ed6109d8f3fb17ca4ddfe58c92864 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f5883d843acfcad96a42a4992069ed7a = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_dd8b8cddc5a74a6064069f88808a9356 = $(`<div id="html_dd8b8cddc5a74a6064069f88808a9356" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>La Matière</h4>         <b>Matériauthèque </b><br><br>         📞 05 46 44 36 25<br>         📍 8 Rond-Point de la République 17180 Périgny<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi; Conception et réalisation d'agencement d'intérieur <br>     </div>     </div>`)[0];
+                popup_f5883d843acfcad96a42a4992069ed7a.setContent(html_dd8b8cddc5a74a6064069f88808a9356);
+            
+        
+
+        marker_da44f18dd9c5953e92782b3ce4a7b243.bindPopup(popup_f5883d843acfcad96a42a4992069ed7a)
+        ;
+
+        
+    
+    
+            marker_da44f18dd9c5953e92782b3ce4a7b243.bindTooltip(
+                `<div>
+                     La Matière
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_da44f18dd9c5953e92782b3ce4a7b243.setIcon(icon_ab7ed6109d8f3fb17ca4ddfe58c92864);
+            
+    
+            var marker_2458c2ca3e858aad5690133fb5a86b15 = L.marker(
+                [43.32420299745943, -0.7827717765206406],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_b39cb6b96967129566ceae2739c0367c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3f049e7a81583210a0e5e74a550a138f = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_dfebc5f6dac1c2b42796f461908a0ef3 = $(`<div id="html_dfebc5f6dac1c2b42796f461908a0ef3" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Le hangar d'aima</h4>         <b>Ressourcerie</b><br><br>         📞 06 42 47 24 56<br>         📍 11 rue du Bourg CASTETNAU-CAMBLONG (64 190)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_3f049e7a81583210a0e5e74a550a138f.setContent(html_dfebc5f6dac1c2b42796f461908a0ef3);
+            
+        
+
+        marker_2458c2ca3e858aad5690133fb5a86b15.bindPopup(popup_3f049e7a81583210a0e5e74a550a138f)
+        ;
+
+        
+    
+    
+            marker_2458c2ca3e858aad5690133fb5a86b15.bindTooltip(
+                `<div>
+                     Le hangar d'aima
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_2458c2ca3e858aad5690133fb5a86b15.setIcon(icon_b39cb6b96967129566ceae2739c0367c);
+            
+    
+            var marker_a8a5ba4446ec382f3e545becc810c6c6 = L.marker(
+                [43.3734828378351, -0.9571245476811602],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_7ac92c8c1b547aeb902f905f2accfd0c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_7deabb882144a4ced7758fb42a1a498f = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_e360a33cda8da899728b17d54e5c8b12 = $(`<div id="html_e360a33cda8da899728b17d54e5c8b12" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Le hangar d'aima</h4>         <b>Ressourcerie</b><br><br>         📞 05 59 38 17 86<br>         📍 Dou Boscq, 64390 Osserain-Rivareyte<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_7deabb882144a4ced7758fb42a1a498f.setContent(html_e360a33cda8da899728b17d54e5c8b12);
+            
+        
+
+        marker_a8a5ba4446ec382f3e545becc810c6c6.bindPopup(popup_7deabb882144a4ced7758fb42a1a498f)
+        ;
+
+        
+    
+    
+            marker_a8a5ba4446ec382f3e545becc810c6c6.bindTooltip(
+                `<div>
+                     Le hangar d'aima
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_a8a5ba4446ec382f3e545becc810c6c6.setIcon(icon_7ac92c8c1b547aeb902f905f2accfd0c);
+            
+    
+            var marker_7c294a44d2e6a445db4b3303d1cc8c1b = L.marker(
+                [43.47598261994442, -0.9470437239157694],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_5186f61894c7127c6b8ffcfb0e091339 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_712f4858b165b54f8c319c52c45c473c = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_b088675c9d8185a7dd7640a02e7e02c4 = $(`<div id="html_b088675c9d8185a7dd7640a02e7e02c4" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Le hangar d'aima</h4>         <b>Ressourcerie</b><br><br>         📞 05 59 38 03 30<br>         📍 Chemin Braquès, ZI du Herré SALIES-DE-BÉARN (64 270)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_712f4858b165b54f8c319c52c45c473c.setContent(html_b088675c9d8185a7dd7640a02e7e02c4);
+            
+        
+
+        marker_7c294a44d2e6a445db4b3303d1cc8c1b.bindPopup(popup_712f4858b165b54f8c319c52c45c473c)
+        ;
+
+        
+    
+    
+            marker_7c294a44d2e6a445db4b3303d1cc8c1b.bindTooltip(
+                `<div>
+                     Le hangar d'aima
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_7c294a44d2e6a445db4b3303d1cc8c1b.setIcon(icon_5186f61894c7127c6b8ffcfb0e091339);
+            
+    
+            var marker_6037ac3152b279ccfb896c92db1a0a51 = L.marker(
+                [44.873, -0.446],
+                {
+}
+            ).addTo(feature_group_c73c21df320eaec3c984fe8bdb07ec81);
+        
+    
+            var icon_fcf2ea84e3ee1c3b6d280a3440b3796e = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_4ea1da424457be919f090a86bdc7959e = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_c3ebe31ccf25908ea83630ae71da45b9 = $(`<div id="html_c3ebe31ccf25908ea83630ae71da45b9" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Occa mat</h4>         <b>Magasin de matériaux neufs et de réemploi</b><br><br>         📞 05 56 30 16 78<br>         📍 89 Avenue Périgord 33370 Sallebœuf<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_4ea1da424457be919f090a86bdc7959e.setContent(html_c3ebe31ccf25908ea83630ae71da45b9);
+            
+        
+
+        marker_6037ac3152b279ccfb896c92db1a0a51.bindPopup(popup_4ea1da424457be919f090a86bdc7959e)
+        ;
+
+        
+    
+    
+            marker_6037ac3152b279ccfb896c92db1a0a51.bindTooltip(
+                `<div>
+                     Occa mat
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6037ac3152b279ccfb896c92db1a0a51.setIcon(icon_fcf2ea84e3ee1c3b6d280a3440b3796e);
+            
+    
+            feature_group_c73c21df320eaec3c984fe8bdb07ec81.addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var feature_group_433f43f798acce0faff5aa2aa05ac71c = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_baa3d51e78c58354f9c06b85b4b22ffd = L.marker(
+                [44.873, -0.446],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_e03af7aff829c914bc14d7d4c61abfb8 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_d98b84e6e7c000ec3db0765aa12a29d1 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_271695d76086df01ce24f233b018ccc6 = $(`<div id="html_271695d76086df01ce24f233b018ccc6" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Accro'bât</h4>         <b>Mathériauthèque</b><br><br>         📞 07 87 68 44 07<br>         📍 89 Avenue Périgord 33370 Sallebœuf<br><br>         <b>Activité :</b><br>Dépose soignée et vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_d98b84e6e7c000ec3db0765aa12a29d1.setContent(html_271695d76086df01ce24f233b018ccc6);
+            
+        
+
+        marker_baa3d51e78c58354f9c06b85b4b22ffd.bindPopup(popup_d98b84e6e7c000ec3db0765aa12a29d1)
+        ;
+
+        
+    
+    
+            marker_baa3d51e78c58354f9c06b85b4b22ffd.bindTooltip(
+                `<div>
+                     Accro'bât
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_baa3d51e78c58354f9c06b85b4b22ffd.setIcon(icon_e03af7aff829c914bc14d7d4c61abfb8);
+            
+    
+            var marker_c17e57685de2aea121d01f4410a7aafd = L.marker(
+                [44.8499458644284, -0.6806574129028021],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_c64acedf65db132ae1e8f071005d6b0c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_9395a53107d65259ce65f6df50f53017 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_414ba0c035dfa2e26b27d6d41fe541fc = $(`<div id="html_414ba0c035dfa2e26b27d6d41fe541fc" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Bordeaux Démolition Services (BDS)</h4>         <b>Entreprise de déconstruction</b><br><br>         📞 05 56 35 08 55<br>         📍 13 rue Gay Lussac MÉRIGNAC (33 700)<br><br>         <b>Activité :</b><br>Dépose soignée <br>     </div>     </div>`)[0];
+                popup_9395a53107d65259ce65f6df50f53017.setContent(html_414ba0c035dfa2e26b27d6d41fe541fc);
+            
+        
+
+        marker_c17e57685de2aea121d01f4410a7aafd.bindPopup(popup_9395a53107d65259ce65f6df50f53017)
+        ;
+
+        
+    
+    
+            marker_c17e57685de2aea121d01f4410a7aafd.bindTooltip(
+                `<div>
+                     Bordeaux Démolition Services (BDS)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_c17e57685de2aea121d01f4410a7aafd.setIcon(icon_c64acedf65db132ae1e8f071005d6b0c);
+            
+    
+            var marker_7ccd6625304589ff962a8a78621475fb = L.marker(
+                [46.432893858256165, 0.11502635072349557],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_9132da772fa59ec66cc92a1dd53e6fa4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5861d577b68feece52576559fe6ba4af = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_df57f61570756596465e0bc4ddee67c5 = $(`<div id="html_df57f61570756596465e0bc4ddee67c5" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Collectif mélusine </h4>         <b>Matériautèque </b><br><br>         📞 06 43 52 22 65<br>         📍 17 rue la Roche Grolleau LUSIGNAN (86 600)<br><br>         <b>Activité :</b><br>Dépose soignée et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_5861d577b68feece52576559fe6ba4af.setContent(html_df57f61570756596465e0bc4ddee67c5);
+            
+        
+
+        marker_7ccd6625304589ff962a8a78621475fb.bindPopup(popup_5861d577b68feece52576559fe6ba4af)
+        ;
+
+        
+    
+    
+            marker_7ccd6625304589ff962a8a78621475fb.bindTooltip(
+                `<div>
+                     Collectif mélusine 
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_7ccd6625304589ff962a8a78621475fb.setIcon(icon_9132da772fa59ec66cc92a1dd53e6fa4);
+            
+    
+            var marker_ded0c9850f367b4c64480e5bd35923b5 = L.marker(
+                [43.27451645698146, -0.3083091053601837],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_2fd7495bb127e862bf46a50db28daba6 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_2bb1a8b27492784ba28447b3c92384a1 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_1e162b630adc981a51c23591862fb3a1 = $(`<div id="html_1e162b630adc981a51c23591862fb3a1" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Ecopôle Pau_est</h4>         <b>Centre de recyclage </b><br><br>         📞 05 54 07 05 80<br>         📍 51 chemin de Morlàas MEILLON (64 510)<br><br>         <b>Activité :</b><br>Collecte et vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_2bb1a8b27492784ba28447b3c92384a1.setContent(html_1e162b630adc981a51c23591862fb3a1);
+            
+        
+
+        marker_ded0c9850f367b4c64480e5bd35923b5.bindPopup(popup_2bb1a8b27492784ba28447b3c92384a1)
+        ;
+
+        
+    
+    
+            marker_ded0c9850f367b4c64480e5bd35923b5.bindTooltip(
+                `<div>
+                     Ecopôle Pau_est
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_ded0c9850f367b4c64480e5bd35923b5.setIcon(icon_2fd7495bb127e862bf46a50db28daba6);
+            
+    
+            var marker_7c108e7da02c4d230203911726645b39 = L.marker(
+                [43.48997306176137, -1.1596921206849622],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_19f4c02d745a5543643c15a73a4b7f97 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5671aa2bfd988fcb45e4cd1ecad126ad = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_9abc5fa31548996d9bb5523e943e1e7b = $(`<div id="html_9abc5fa31548996d9bb5523e943e1e7b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>La manufaktura</h4>         <b>Matériautèque </b><br><br>         📞 06 64 66 12 16<br>         📍 Route de Guiche, lieu-dit Barbé BIDACHE (64 520)<br><br>         <b>Activité :</b><br>Dépose soignée et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_5671aa2bfd988fcb45e4cd1ecad126ad.setContent(html_9abc5fa31548996d9bb5523e943e1e7b);
+            
+        
+
+        marker_7c108e7da02c4d230203911726645b39.bindPopup(popup_5671aa2bfd988fcb45e4cd1ecad126ad)
+        ;
+
+        
+    
+    
+            marker_7c108e7da02c4d230203911726645b39.bindTooltip(
+                `<div>
+                     La manufaktura
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_7c108e7da02c4d230203911726645b39.setIcon(icon_19f4c02d745a5543643c15a73a4b7f97);
+            
+    
+            var marker_e85742e2227de47fa21f7f7f52c1aea7 = L.marker(
+                [44.502, 0.161],
+                {
+}
+            ).addTo(feature_group_433f43f798acce0faff5aa2aa05ac71c);
+        
+    
+            var icon_793c836612738099a2cb0b4f9b56767f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "wrench",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_146b57a17c4cf6ef2eb95f293d69f995 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_8aa53bdea8704cde46982a54013c54a5 = $(`<div id="html_8aa53bdea8704cde46982a54013c54a5" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>SOREM</h4>         <b>Vente de matériaux provenants de surplus </b><br><br>         📞 05 53 20 86 24<br>         📍 Lanthillac 47200 Marmande<br><br>         <b>Activité :</b><br>Dépose soignée et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_146b57a17c4cf6ef2eb95f293d69f995.setContent(html_8aa53bdea8704cde46982a54013c54a5);
+            
+        
+
+        marker_e85742e2227de47fa21f7f7f52c1aea7.bindPopup(popup_146b57a17c4cf6ef2eb95f293d69f995)
+        ;
+
+        
+    
+    
+            marker_e85742e2227de47fa21f7f7f52c1aea7.bindTooltip(
+                `<div>
+                     SOREM
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e85742e2227de47fa21f7f7f52c1aea7.setIcon(icon_793c836612738099a2cb0b4f9b56767f);
+            
+    
+            feature_group_433f43f798acce0faff5aa2aa05ac71c.addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var feature_group_f9ad6f2e5abe05726a4e1355cd29fe94 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_75663da23d2359c87e03e905082357cb = L.marker(
+                [46.633523649828426, 0.3439693390958955],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_46e6762fbb000a1d24439809e363f558 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_c563891584a506b0bdcf9864b00ff2e6 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_c4c57289be205be7ef25847fb7ac3e27 = $(`<div id="html_c4c57289be205be7ef25847fb7ac3e27" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>La regratterie</h4>         <b>Matériautèque </b><br><br>         📞 07 66 11 60 85<br>         📍 58 rue de la Longerolle MIGNÉ-AUXANCES (86 440)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi + Upcycling (mobilier, ferronerie) + Ateliers de sensibilisation <br>     </div>     </div>`)[0];
+                popup_c563891584a506b0bdcf9864b00ff2e6.setContent(html_c4c57289be205be7ef25847fb7ac3e27);
+            
+        
+
+        marker_75663da23d2359c87e03e905082357cb.bindPopup(popup_c563891584a506b0bdcf9864b00ff2e6)
+        ;
+
+        
+    
+    
+            marker_75663da23d2359c87e03e905082357cb.bindTooltip(
+                `<div>
+                     La regratterie
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_75663da23d2359c87e03e905082357cb.setIcon(icon_46e6762fbb000a1d24439809e363f558);
+            
+    
+            var marker_1b9f3b6bfe16c6b73a5cecce6351a766 = L.marker(
+                [46.620577754794425, 0.07527565073949632],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_2f5517286cc8981512ebf973fcdfdf3f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f58572663aa5fa5d8fbb393b173d4a4b = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_ad902e052a91a0d3091622b534281320 = $(`<div id="html_ad902e052a91a0d3091622b534281320" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Le sens du fil </h4>         <b>Matériautèque </b><br><br>         📞 07 81 82 98 43<br>         📍 43 place Robert Gerbier LATILLÉ (86 190)<br><br>         <b>Activité :</b><br>Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_f58572663aa5fa5d8fbb393b173d4a4b.setContent(html_ad902e052a91a0d3091622b534281320);
+            
+        
+
+        marker_1b9f3b6bfe16c6b73a5cecce6351a766.bindPopup(popup_f58572663aa5fa5d8fbb393b173d4a4b)
+        ;
+
+        
+    
+    
+            marker_1b9f3b6bfe16c6b73a5cecce6351a766.bindTooltip(
+                `<div>
+                     Le sens du fil 
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_1b9f3b6bfe16c6b73a5cecce6351a766.setIcon(icon_2f5517286cc8981512ebf973fcdfdf3f);
+            
+    
+            var marker_6e674133fc7d00ff483480d347476336 = L.marker(
+                [46.0, 0.5],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_9d1d97611c35fcd7eabcb60d6be6ae28 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_63e25807675cd4483df455c6f74df68f = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_f081d3f3b2cb90bbf2cb4b7986804ae2 = $(`<div id="html_f081d3f3b2cb90bbf2cb4b7986804ae2" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Les Ateliers de Saint Gaudent</h4>         <b>Magasin de matériaux de réemploi</b><br><br>         📞 05 49 87 10 39<br>         📍 Le Bourg 86400 Saint-Gaudent<br><br>         <b>Activité :</b><br>Dépose soignée, vente de matériaux de réemploi et reconditionnement <br>     </div>     </div>`)[0];
+                popup_63e25807675cd4483df455c6f74df68f.setContent(html_f081d3f3b2cb90bbf2cb4b7986804ae2);
+            
+        
+
+        marker_6e674133fc7d00ff483480d347476336.bindPopup(popup_63e25807675cd4483df455c6f74df68f)
+        ;
+
+        
+    
+    
+            marker_6e674133fc7d00ff483480d347476336.bindTooltip(
+                `<div>
+                     Les Ateliers de Saint Gaudent
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6e674133fc7d00ff483480d347476336.setIcon(icon_9d1d97611c35fcd7eabcb60d6be6ae28);
+            
+    
+            var marker_18ec95bc80029d748e866431718cab5f = L.marker(
+                [44.8330870837964, -0.6513839610555161],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_77c9f39e3e0fc8aa156e551352a7a186 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_364546a9eb1aea35199f7797948cabb7 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_1683873063aa8720acef9c1a2ed4b45b = $(`<div id="html_1683873063aa8720acef9c1a2ed4b45b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Officine du réemploi </h4>         <b>Atelier de fabrication à base de bois de réemploi</b><br><br>         📞 06 25 76 34 20<br>         📍 26 avenue de la Somme – 33 700 Mérignac<br><br>         <b>Activité :</b><br>Conception, création et fabricaton<br>     </div>     </div>`)[0];
+                popup_364546a9eb1aea35199f7797948cabb7.setContent(html_1683873063aa8720acef9c1a2ed4b45b);
+            
+        
+
+        marker_18ec95bc80029d748e866431718cab5f.bindPopup(popup_364546a9eb1aea35199f7797948cabb7)
+        ;
+
+        
+    
+    
+            marker_18ec95bc80029d748e866431718cab5f.bindTooltip(
+                `<div>
+                     Officine du réemploi 
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_18ec95bc80029d748e866431718cab5f.setIcon(icon_77c9f39e3e0fc8aa156e551352a7a186);
+            
+    
+            var marker_18719a7b48c80f6707fb669d2f8726f8 = L.marker(
+                [43.4925, -1.4743],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_43e108b4f343f632e9ae015e137f88dd = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_298f64675a7a7fb52b2b7dc57bbdeaaf = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_48afabbcd036cfa2dac1bab3e860ed8c = $(`<div id="html_48afabbcd036cfa2dac1bab3e860ed8c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Patxa Ma</h4>         <b>-</b><br><br>         📞 -<br>         📍 58 chemin de Saint-Bernard 64100 Bayonne<br><br>         <b>Activité :</b><br>Dépose soignée Market place; Vente de matériaux de réemploi et reconditionnement<br>     </div>     </div>`)[0];
+                popup_298f64675a7a7fb52b2b7dc57bbdeaaf.setContent(html_48afabbcd036cfa2dac1bab3e860ed8c);
+            
+        
+
+        marker_18719a7b48c80f6707fb669d2f8726f8.bindPopup(popup_298f64675a7a7fb52b2b7dc57bbdeaaf)
+        ;
+
+        
+    
+    
+            marker_18719a7b48c80f6707fb669d2f8726f8.bindTooltip(
+                `<div>
+                     Patxa Ma
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_18719a7b48c80f6707fb669d2f8726f8.setIcon(icon_43e108b4f343f632e9ae015e137f88dd);
+            
+    
+            var marker_bdbc1bff9b41e9d6ccc9f4b0871cf7d5 = L.marker(
+                [46.323716, -0.464777],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_2c5a806eca26bf41a1f9bbb84dd17b5d = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_8c5717e92f145157ddf49b0880d65a07 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_035e53f4b369a81b4ff66919e7304b51 = $(`<div id="html_035e53f4b369a81b4ff66919e7304b51" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Raivalor</h4>         <b>Matériauthèque et structure d'insertion </b><br><br>         📞 05 49 09 27 46<br>         📍 11 rue Henri Sellier 79000 Niort<br><br>         <b>Activité :</b><br>Dépose soignée Market place et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_8c5717e92f145157ddf49b0880d65a07.setContent(html_035e53f4b369a81b4ff66919e7304b51);
+            
+        
+
+        marker_bdbc1bff9b41e9d6ccc9f4b0871cf7d5.bindPopup(popup_8c5717e92f145157ddf49b0880d65a07)
+        ;
+
+        
+    
+    
+            marker_bdbc1bff9b41e9d6ccc9f4b0871cf7d5.bindTooltip(
+                `<div>
+                     Raivalor
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_bdbc1bff9b41e9d6ccc9f4b0871cf7d5.setIcon(icon_2c5a806eca26bf41a1f9bbb84dd17b5d);
+            
+    
+            var marker_34a25754bd18ff3b2005bc1ac0e22ff3 = L.marker(
+                [43.585, -1.39],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_561a764cca862d247ddd3a04136223aa = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_24f4a2767341e39633e09a5ed3d9d7ea = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_cc9157e91b1925fe7debca038d8a5ad5 = $(`<div id="html_cc9157e91b1925fe7debca038d8a5ad5" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Soli'Bât 40</h4>         <b>Vente et transfert vers l'ESS de matériaux de réemploi </b><br><br>         📞 06 16 16 68 87<br>         📍 3635 route de Northon 40390 Saint-Martin-de-Seignanx<br><br>         <b>Activité :</b><br>Collecte et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_24f4a2767341e39633e09a5ed3d9d7ea.setContent(html_cc9157e91b1925fe7debca038d8a5ad5);
+            
+        
+
+        marker_34a25754bd18ff3b2005bc1ac0e22ff3.bindPopup(popup_24f4a2767341e39633e09a5ed3d9d7ea)
+        ;
+
+        
+    
+    
+            marker_34a25754bd18ff3b2005bc1ac0e22ff3.bindTooltip(
+                `<div>
+                     Soli'Bât 40
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_34a25754bd18ff3b2005bc1ac0e22ff3.setIcon(icon_561a764cca862d247ddd3a04136223aa);
+            
+    
+            var marker_360d9925ea7c6bf7ae65823fd6550e06 = L.marker(
+                [44.8378, -0.5792],
+                {
+}
+            ).addTo(feature_group_f9ad6f2e5abe05726a4e1355cd29fe94);
+        
+    
+            var icon_08e76ce7538bb5bbba6b80830b603e56 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "recycle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_08c79afe775c6b962e1542dcba11f950 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_b72381dae5c2272a9dbc8dbd7856183f = $(`<div id="html_b72381dae5c2272a9dbc8dbd7856183f" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Soli'Bât Gironde</h4>         <b>Vente de matériaux de réemploi </b><br><br>         📞 07 63 44 24 91<br>         📍 24 rue Paul Mamert 33800 Bordeaux<br><br>         <b>Activité :</b><br>Dépose soignée et Vente de matériaux de réemploi<br>     </div>     </div>`)[0];
+                popup_08c79afe775c6b962e1542dcba11f950.setContent(html_b72381dae5c2272a9dbc8dbd7856183f);
+            
+        
+
+        marker_360d9925ea7c6bf7ae65823fd6550e06.bindPopup(popup_08c79afe775c6b962e1542dcba11f950)
+        ;
+
+        
+    
+    
+            marker_360d9925ea7c6bf7ae65823fd6550e06.bindTooltip(
+                `<div>
+                     Soli'Bât Gironde
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_360d9925ea7c6bf7ae65823fd6550e06.setIcon(icon_08e76ce7538bb5bbba6b80830b603e56);
+            
+    
+            feature_group_f9ad6f2e5abe05726a4e1355cd29fe94.addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var feature_group_3124d8d7a306c4bd1265ab40d58327f6 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_46330dc2f5c7c8274846d40936028eca = L.marker(
+                [45.15, 0.9],
+                {
+}
+            ).addTo(feature_group_3124d8d7a306c4bd1265ab40d58327f6);
+        
+    
+            var icon_7742bf43b8db8825de82d893d8f244c8 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "archive",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_545ef357a42287482efd20db40e35cee = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_08223a1bfe76297e1e62fbf9f5ced7e3 = $(`<div id="html_08223a1bfe76297e1e62fbf9f5ced7e3" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Lascombes Matériaux Anciens Sud-Ouest</h4>         <b>Negoce de matériaux anciens </b><br><br>         📞 01 34 76 55 00<br>         📍 Les Millials 24170 Saint-Laurent-La-Vallée<br><br>         <b>Activité :</b><br>Vente de matériaux anciens<br>     </div>     </div>`)[0];
+                popup_545ef357a42287482efd20db40e35cee.setContent(html_08223a1bfe76297e1e62fbf9f5ced7e3);
+            
+        
+
+        marker_46330dc2f5c7c8274846d40936028eca.bindPopup(popup_545ef357a42287482efd20db40e35cee)
+        ;
+
+        
+    
+    
+            marker_46330dc2f5c7c8274846d40936028eca.bindTooltip(
+                `<div>
+                     Lascombes Matériaux Anciens Sud-Ouest
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_46330dc2f5c7c8274846d40936028eca.setIcon(icon_7742bf43b8db8825de82d893d8f244c8);
+            
+    
+            var marker_ba68f1158b8a0d4c9c198212b0dbecf7 = L.marker(
+                [45.75, -0.783],
+                {
+}
+            ).addTo(feature_group_3124d8d7a306c4bd1265ab40d58327f6);
+        
+    
+            var icon_56edceafde66888350cefe2f60c65fc5 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "archive",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_6ff0db1df9cf56788ede19180d6e01cb = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_2f631d3a71f86c89a91d7a905f500dbb = $(`<div id="html_2f631d3a71f86c89a91d7a905f500dbb" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Lieval et Fils - Les Vieilles Pierres</h4>         <b>Tailleur de pièrre, négoce d'éléments en pierre </b><br><br>         📞 05 46 95 01 58<br>         📍 5 route de Beurlay 17250 Saint-Sulpice-d'Arnoult<br><br>         <b>Activité :</b><br>Dépose soignée et vente de matéiaux anciens<br>     </div>     </div>`)[0];
+                popup_6ff0db1df9cf56788ede19180d6e01cb.setContent(html_2f631d3a71f86c89a91d7a905f500dbb);
+            
+        
+
+        marker_ba68f1158b8a0d4c9c198212b0dbecf7.bindPopup(popup_6ff0db1df9cf56788ede19180d6e01cb)
+        ;
+
+        
+    
+    
+            marker_ba68f1158b8a0d4c9c198212b0dbecf7.bindTooltip(
+                `<div>
+                     Lieval et Fils - Les Vieilles Pierres
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_ba68f1158b8a0d4c9c198212b0dbecf7.setIcon(icon_56edceafde66888350cefe2f60c65fc5);
+            
+    
+            var marker_452fba23c90952292a26635fd4f9220b = L.marker(
+                [44.75, 0.1],
+                {
+}
+            ).addTo(feature_group_3124d8d7a306c4bd1265ab40d58327f6);
+        
+    
+            var icon_02afcf0e5d42fb82600a5fe323c23268 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "gray",
+  "iconColor": "white",
+  "icon": "archive",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_8ddab3e695c9bdf6c30908d2517e57dc = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_8cb1a2433975c976e930e84c86551e08 = $(`<div id="html_8cb1a2433975c976e930e84c86551e08" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>Olivier de Bonfils</h4>         <b>Société de négoce de matériaux anciens </b><br><br>         📞 02 38 36 11 60<br>         📍 La Tissanderie 24520 Liorac-Sur-Louyre<br><br>         <b>Activité :</b><br>Dépose soignée et vente de matériaux anciens<br>     </div>     </div>`)[0];
+                popup_8ddab3e695c9bdf6c30908d2517e57dc.setContent(html_8cb1a2433975c976e930e84c86551e08);
+            
+        
+
+        marker_452fba23c90952292a26635fd4f9220b.bindPopup(popup_8ddab3e695c9bdf6c30908d2517e57dc)
+        ;
+
+        
+    
+    
+            marker_452fba23c90952292a26635fd4f9220b.bindTooltip(
+                `<div>
+                     Olivier de Bonfils
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_452fba23c90952292a26635fd4f9220b.setIcon(icon_02afcf0e5d42fb82600a5fe323c23268);
+            
+    
+            feature_group_3124d8d7a306c4bd1265ab40d58327f6.addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var marker_900090c22e9fcd8a0b4865c5be976971 = L.marker(
+                [43.481402, -1.514699],
+                {
+}
+            ).addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var icon_266602978fbbca812acf3493f16c23a4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "university",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_85c21d834d755a106c60a85e03023500 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_429b9f3faf92b442a01a3d7e94bb8e8c = $(`<div id="html_429b9f3faf92b442a01a3d7e94bb8e8c" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>NOBATEK/INEF4</h4>         <b>-</b><br><br>         📞 05 59 03 61 29<br>         📍 67 rue de Mirambeau 64600 Anglet<br><br>         <b>Activité :</b><br>-<br>     </div>     </div>`)[0];
+                popup_85c21d834d755a106c60a85e03023500.setContent(html_429b9f3faf92b442a01a3d7e94bb8e8c);
+            
+        
+
+        marker_900090c22e9fcd8a0b4865c5be976971.bindPopup(popup_85c21d834d755a106c60a85e03023500)
+        ;
+
+        
+    
+    
+            marker_900090c22e9fcd8a0b4865c5be976971.bindTooltip(
+                `<div>
+                     NOBATEK/INEF4
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_900090c22e9fcd8a0b4865c5be976971.setIcon(icon_266602978fbbca812acf3493f16c23a4);
+            
+    
+            var marker_3201e184b4a4cb5843264fa3dd9dd359 = L.marker(
+                [44.8378, -0.5792],
+                {
+}
+            ).addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+        
+    
+            var icon_4e1e8a490204f749f7e669b2b51122d9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "university",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_0f3d6b86167eff9b4acc76d584131884 = L.popup({
+  "maxWidth": 350,
+});
+
+        
+            
+                var html_8a15d4aeee947051c2c50d1fec040c9b = $(`<div id="html_8a15d4aeee947051c2c50d1fec040c9b" style="width: 100.0%; height: 100.0%;">     <div style="font-family: Arial; font-size: 13px;">         <h4>NOBATEK/INEF4</h4>         <b>-</b><br><br>         📞 05 64 31 23 00<br>         📍 9 rue Jean-Paul Alaux 33100 Bordeaux<br><br>         <b>Activité :</b><br>-<br>     </div>     </div>`)[0];
+                popup_0f3d6b86167eff9b4acc76d584131884.setContent(html_8a15d4aeee947051c2c50d1fec040c9b);
+            
+        
+
+        marker_3201e184b4a4cb5843264fa3dd9dd359.bindPopup(popup_0f3d6b86167eff9b4acc76d584131884)
+        ;
+
+        
+    
+    
+            marker_3201e184b4a4cb5843264fa3dd9dd359.bindTooltip(
+                `<div>
+                     NOBATEK/INEF4
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_3201e184b4a4cb5843264fa3dd9dd359.setIcon(icon_4e1e8a490204f749f7e669b2b51122d9);
+            
+    
+            var layer_control_c8fc5b19f8e2476724cd8f6115a62a18_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_66f6c5dacb80d00c6644ea39088b0aff,
+                },
+                overlays :  {
+                    "\u003ci class=\u0027fa fa-shopping-cart\u0027\u003e\u003c/i\u003e Vente de mat\u00e9riaux de r\u00e9emploi" : feature_group_c73c21df320eaec3c984fe8bdb07ec81,
+                    "\u003ci class=\u0027fa fa-wrench\u0027\u003e\u003c/i\u003e Vente + D\u00e9pose soign\u00e9e" : feature_group_433f43f798acce0faff5aa2aa05ac71c,
+                    "\u003ci class=\u0027fa fa-recycle\u0027\u003e\u003c/i\u003e Vente + D\u00e9pose + Reconditionnement" : feature_group_f9ad6f2e5abe05726a4e1355cd29fe94,
+                    "\u003ci class=\u0027fa fa-archive\u0027\u003e\u003c/i\u003e Vente de mat\u00e9riaux anciens" : feature_group_3124d8d7a306c4bd1265ab40d58327f6,
+                },
+            };
+            let layer_control_c8fc5b19f8e2476724cd8f6115a62a18 = L.control.layers(
+                layer_control_c8fc5b19f8e2476724cd8f6115a62a18_layers.base_layers,
+                layer_control_c8fc5b19f8e2476724cd8f6115a62a18_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_a319fa214a0c0f4015eefb8c26bcf46c);
+
+        
+</script>
+</html>
